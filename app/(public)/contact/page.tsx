@@ -1,10 +1,41 @@
+"use client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
+import { apiClient } from "@/app/lib/axiosConfig";
+import { toast } from "sonner";
+import { useState } from "react";
+
 export default function ContactPage() {
+    const [form, setForm] = useState({
+      name: "",
+      email: "",
+      message: "",
+    });
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm({ ...form, [e.target.id]: e.target.value });
+    };
+
+
+    const handleSubmit = async () => {
+      try {
+        await apiClient.post("/contacts", form);
+
+        toast.success("Message sent successfully ✅");
+
+        setForm({
+          name: "",
+          email: "",
+          message: "",
+        });
+      } catch {
+        toast.error("Failed to send message ❌");
+      }
+    };
   return (
     <main className="bg-background text-foreground">
       {/* HEADER */}
@@ -39,20 +70,26 @@ export default function ContactPage() {
 
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Enter your name" />
+              <Input 
+              id="name" value={form.name}
+  onChange={handleChange} placeholder="Enter your name" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="Enter your email" />
+              <Input id="email" type="email" value={form.email}
+               onChange={handleChange} placeholder="Enter your email" />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="message">Message</Label>
-              <Textarea id="message" placeholder="Write your message..." />
+              <Textarea id="message" value={form.message}
+             onChange={handleChange} placeholder="Write your message..." />
             </div>
 
-            <Button className="w-full">Submit</Button>
+            <Button className="w-full" onClick={handleSubmit}>
+              Submit
+            </Button>
           </CardContent>
         </Card>
       </section>
