@@ -1,56 +1,67 @@
 import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-    basePath: "/salesforce-academy",
+  basePath: "/salesforce-academy",
     turbopack: {
         root: __dirname,
     },
-    images: {
+  images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "localhost",
-        port: "5000",
-        pathname: "/uploads/**",
-      },
-      {
-        protocol: "http",
-        hostname: "192.168.1.116", // ✅ your local IP (important)
-        port: "5000",
+        protocol: "https",
+        hostname: "bluecloudmentor-service.onrender.com",
         pathname: "/uploads/**",
       },
     ],
   },
-    async redirects() {
-        if (process.env.NODE_ENV === "development") {
-            return [
-                {
-                    source: "/",
-                    destination: "/salesforce-academy",
-                    permanent: false,
-                    basePath: false
-                }
-            ];
-        }
-        return [];
-    },
-    async rewrites() {
-        if (process.env.NODE_ENV === "development") {
-            return [
-                {
-                    source: "/api-proxy/:path*",
-                    destination: "http://localhost:5000/:path*",
-                    basePath: false,
-                },
-                {
-                    source: "/auth-api/:path*",
-                    destination: "http://salesforce-academy.test/:path*",
-                    basePath: false,
-                },
-            ];
-        }
-        return [];
+
+  async redirects() {
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/",
+          destination: "/salesforce-academy",
+          permanent: false,
+          basePath: false,
+        },
+      ];
     }
+    return [];
+  },
+
+  async rewrites() {
+    // 🔹 DEV (your existing)
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/api-proxy/:path*",
+          destination: "http://localhost:5000/:path*",
+          basePath: false,
+        },
+        {
+          source: "/auth-api/:path*",
+          destination: "http://salesforce-academy.test/:path*",
+          basePath: false,
+        },
+      ];
+    }
+
+    // 🔥 PROD (IMPORTANT ADD)
+    return [
+      {
+        source: "/api-proxy/:path*",
+        destination: "https://bluecloudmentor-service.onrender.com/:path*",
+      },
+      {
+        source: "/auth-api/:path*",
+        destination: "https://bluecloudmentor-service.onrender.com/:path*",
+      },
+      {
+        source: "/salesforce-api/:path*",
+        destination: "https://bluecloudmentor-service.onrender.com/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;
