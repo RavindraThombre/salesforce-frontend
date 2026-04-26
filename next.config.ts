@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    if (process.env.NODE_ENV === "development") {
+    // if (process.env.NODE_ENV === "development") {
       return [
         {
           source: "/",
@@ -25,12 +25,11 @@ const nextConfig: NextConfig = {
           basePath: false,
         },
       ];
-    }
-    return [];
+    // }
+    // return [];
   },
 
   async rewrites() {
-    // 🔹 DEV (your existing)
     if (process.env.NODE_ENV === "development") {
       return [
         {
@@ -51,14 +50,17 @@ const nextConfig: NextConfig = {
       {
         source: "/api-proxy/:path*",
         destination: "https://bluecloudmentor-service.onrender.com/:path*",
+        basePath: false,
       },
       {
         source: "/auth-api/:path*",
         destination: "https://bluecloudmentor-service.onrender.com/:path*",
+        basePath: false,
       },
       {
         source: "/salesforce-api/:path*",
         destination: "https://bluecloudmentor-service.onrender.com/:path*",
+        basePath: false,
       },
     ];
   },
