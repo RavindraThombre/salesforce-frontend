@@ -20,9 +20,10 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: "/", // domain root
-        destination: "/salesforce-academy", // your basePath
+        source: "/",
+        destination: "/salesforce-academy",
         permanent: true,
+        basePath: false,
       },
     ];
   },
