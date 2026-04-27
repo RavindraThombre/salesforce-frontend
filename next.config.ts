@@ -2,9 +2,11 @@ import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   basePath: "/salesforce-academy",
-    turbopack: {
-        root: __dirname,
-    },
+
+  turbopack: {
+    root: __dirname,
+  },
+
   images: {
     remotePatterns: [
       {
@@ -16,17 +18,13 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    // if (process.env.NODE_ENV === "development") {
-      return [
-        {
-          source: "/",
-          destination: "/salesforce-academy",
-          permanent: false,
-          basePath: false,
-        },
-      ];
-    // }
-    // return [];
+    return [
+      {
+        source: "/", // domain root
+        destination: "/salesforce-academy", // your basePath
+        permanent: true,
+      },
+    ];
   },
 
   async rewrites() {
@@ -35,32 +33,30 @@ const nextConfig: NextConfig = {
         {
           source: "/api-proxy/:path*",
           destination: "http://localhost:5000/:path*",
-          basePath: false,
         },
         {
           source: "/auth-api/:path*",
           destination: "http://salesforce-academy.test/:path*",
-          basePath: false,
         },
       ];
     }
 
-    // 🔥 PROD (IMPORTANT ADD)
+    // ✅ PROD
     return [
       {
         source: "/api-proxy/:path*",
-        destination: "https://bluecloudmentor-service.onrender.com/:path*",
-        basePath: false,
+        destination:
+          "https://bluecloudmentor-service.onrender.com/:path*",
       },
       {
         source: "/auth-api/:path*",
-        destination: "https://bluecloudmentor-service.onrender.com/:path*",
-        basePath: false,
+        destination:
+          "https://bluecloudmentor-service.onrender.com/:path*",
       },
       {
         source: "/salesforce-api/:path*",
-        destination: "https://bluecloudmentor-service.onrender.com/:path*",
-        basePath: false,
+        destination:
+          "https://bluecloudmentor-service.onrender.com/:path*",
       },
     ];
   },
