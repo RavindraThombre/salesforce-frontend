@@ -43,23 +43,23 @@ const nextConfig: NextConfig = {
     }
 
     // ✅ PROD
-    return [
-      {
-        source: "/api-proxy/:path*",
-        destination:
-          "https://bluecloudmentor-service.onrender.com/:path*",
-      },
-      {
-        source: "/auth-api/:path*",
-        destination:
-          "https://bluecloudmentor-service.onrender.com/:path*",
-      },
-      {
-        source: "/salesforce-api/:path*",
-        destination:
-          "https://bluecloudmentor-service.onrender.com/:path*",
-      },
-    ];
+   return [
+  {
+    source: "/api-proxy/:path*",
+    destination: "https://bluecloudmentor-service.onrender.com/:path*",
+    // basePath: false,
+  },
+  {
+    source: "/auth-api/:path*",
+    destination: "https://bluecloudmentor-service.onrender.com/:path*",
+    // basePath: false,
+  },
+  {
+    source: "/salesforce-api/:path*",
+    destination: "https://bluecloudmentor-service.onrender.com/:path*",
+    // basePath: false,
+  },
+];
   },
 };
 
