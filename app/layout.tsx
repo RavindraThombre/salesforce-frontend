@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     siteName: "BlueCloudMentor",
     images: [
       {
-        url: "/logo.png", // place your logo inside /public/logo.png
+        url: "/salesforce-academy/logo.png", // place your logo inside /public/logo.png
         width: 1200,
         height: 630,
         alt: "BlueCloudMentor Logo",
@@ -67,12 +67,12 @@ export const metadata: Metadata = {
     title: "BlueCloudMentor | Salesforce Training & Certification",
     description:
       "Learn Salesforce with live projects, certification prep, and career support.",
-    images: ["/logo.png"],
+    images: ["/salesforce-academy/logo.png"],
   },
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/salesforce-academy/logo.png",
+    shortcut: "/salesforce-academy/logo.png",
+    apple: "/salesforce-academy/logo.png",
   },
 };
 
