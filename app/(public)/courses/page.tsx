@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getCourses } from "./lib/publicCourses";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 
 type Course = {
   _id: string;
@@ -44,10 +45,40 @@ export default function CoursesPage() {
   }, []);
 
   if (loading) {
+    return <SalesforceLoader />;
+  }
+
+  if (!courses.length) {
     return (
-      <div className="p-10 text-center">
-        <p>Loading courses...</p>
-      </div>
+      <main className="min-h-screen flex items-center justify-center bg-background px-6">
+        {" "}
+        <div className="text-center max-w-xl">
+          {" "}
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold"
+            style={{
+              color: "var(--wes-g-color-palette-blue-20, #032D60)",
+              fontFamily:
+                "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
+            }}
+          >
+            {" "}
+            No Courses Available{" "}
+          </h2>{" "}
+          <p className="mt-4 text-muted-foreground text-base sm:text-lg leading-relaxed">
+            {" "}
+            We’re currently updating our premium Salesforce programs. Please
+            check back soon for new course launches.{" "}
+          </p>{" "}
+          <Link href="/">
+            {" "}
+            <Button className="mt-8 px-8 rounded-2xl">
+              {" "}
+              Back to Home{" "}
+            </Button>{" "}
+          </Link>{" "}
+        </div>{" "}
+      </main>
     );
   }
 

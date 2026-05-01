@@ -5,11 +5,9 @@ import { Bell, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
-  NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
 
 import {
@@ -26,6 +24,8 @@ import { LogOut, User } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import ThemeToggle from "../ThemeToggle";
 import { useUser } from "@/app/context/UserContext";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function Navbar() {
   const { user } = useUser();
@@ -34,29 +34,48 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* LOGO */}
-        <Link
-          href="/"
-          className="flex flex-col leading-tight hover:opacity-90 transition"
-        >
-          <div className="flex items-center gap-2">
-            {/* ICON */}
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-blue-500 via-sky-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-md">
-              BCM
+        <Link href="/" className="group flex items-center gap-3 leading-tight">
+          {/* LOGO */}
+          <motion.div
+            initial={{ scale: 0.96 }}
+            whileHover={{
+              scale: 1.06,
+              rotate: [0, -2, 2, 0],
+            }}
+            transition={{
+              duration: 0.45,
+              ease: "easeInOut",
+            }}
+            className="relative shrink-0 py-2"
+          >
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden flex items-center justify-center bg-white shadow-md group-hover:shadow-2xl transition-all duration-300">
+              <Image
+                src="/salesforce-academy/logo-bcm.png"
+                alt="BlueCloudMentor Logo"
+                width={220}
+                height={220}
+                className="object-cover w-full h-full scale-110"
+                priority
+              />
             </div>
+          </motion.div>
 
-            {/* TEXT */}
-            <div className="flex flex-col leading-tight">
-              <span className="text-lg font-semibold tracking-tight">
-                <span className="bg-gradient-to-r from-blue-500 via-sky-500 to-indigo-600 bg-clip-text text-transparent">
-                  BlueCloud
-                </span>
-                <span className="text-foreground">Mentor</span>
+          {/* TEXT */}
+          <div className="flex flex-col justify-center leading-tight">
+            <motion.span
+              whileHover={{ x: 2 }}
+              transition={{ duration: 0.3 }}
+              className="text-lg sm:text-xl font-bold tracking-tight"
+            >
+              <span className="bg-gradient-to-r from-blue-500 via-sky-500 to-indigo-600 bg-clip-text text-transparent">
+                BlueCloud
               </span>
+              <span className="text-foreground">Mentor</span>
+            </motion.span>
 
-              <span className="text-[10px] text-muted-foreground">
-                Learn. Build. Grow.
-              </span>
-            </div>
+            <span className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+              Learn. Build. Grow.
+            </span>
           </div>
         </Link>
 
