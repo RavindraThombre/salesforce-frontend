@@ -8,6 +8,7 @@ import { apiClient } from "@/app/lib/axiosConfig";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 type LiveClass = {
   _id: string;
@@ -111,15 +112,40 @@ export default function LiveClassesPage() {
   return (
     <main className="bg-background text-foreground">
       {/* HEADER */}
-      <section className="py-20 text-center px-6">
-        <h1 className="text-4xl md:text-5xl font-bold">
-          Live Classes Schedule (Zoom)
-        </h1>
-        <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-          Join our live instructor-led Salesforce classes via Zoom.
-        </p>
-      </section>
+      <section className="relative py-4 md:py-6 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
 
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full hover:bg-primary/10"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+
+            <div>
+              <h2
+                className="text-base sm:text-xl font-semibold tracking-tight capitalize"
+                style={{
+                  fontFamily:
+                    "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
+                }}
+              >
+                Live Classes Schedule
+              </h2>
+
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-2xl">
+                Join our instructor-led Salesforce classes live on Zoom and
+                learn from industry experts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
       {/* CLASS LIST */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -199,14 +225,27 @@ export default function LiveClassesPage() {
       </section>
 
       {/* INFO */}
-      <section className="bg-muted py-16 text-center px-6">
-        <h2 className="text-3xl font-bold">Don’t Miss a Class</h2>
-        <p className="mt-3 text-muted-foreground">
-          Enroll in a course to get automatic Zoom links and reminders.
-        </p>
-        <Button size="lg" className="mt-6" asChild>
-          <Link href="/courses">View Courses</Link>
-        </Button>
+      <section className="bg-muted/40 py-12">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2
+            className="text-xl sm:text-2xl md:text-3xl font-semibold"
+            style={{
+              fontFamily:
+                "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
+            }}
+          >
+            Don’t Miss a Class
+          </h2>
+
+          <p className="mt-2 text-sm text-muted-foreground max-w-2xl mx-auto">
+            Enroll in a Salesforce course to receive Zoom meeting links, class
+            reminders, and access to live instructor-led sessions.
+          </p>
+
+          <Button size="lg" className="mt-6 rounded-xl px-8" asChild>
+            <Link href="/courses">Explore Courses</Link>
+          </Button>
+        </div>
       </section>
     </main>
   );

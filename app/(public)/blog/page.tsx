@@ -6,6 +6,8 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getBlogs } from "./lib/blogApi";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 type Blog = {
   _id: string;
@@ -16,6 +18,7 @@ type Blog = {
 };
 
 export default function BlogPage() {
+  const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
@@ -34,11 +37,37 @@ export default function BlogPage() {
   return (
     <main className="bg-background text-foreground">
       {/* HEADER */}
-      <section className="py-16 text-center">
-        <h1 className="text-4xl font-bold">Salesforce Blog</h1>
-        <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-          Tips, tutorials, and career guidance for Salesforce learners.
-        </p>
+      <section className="relative py-4 md:py-6 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="rounded-full hover:bg-primary/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+
+            <div>
+              <h2
+                className="text-base sm:text-xl font-semibold tracking-tight capitalize"
+                style={{
+                  fontFamily:
+                    "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
+                }}
+              >
+                Salesforce Blog
+              </h2>
+
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
+                Tips, tutorials, and career guidance for Salesforce learners.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* BLOG LIST */}
@@ -66,9 +95,7 @@ export default function BlogPage() {
                   })}
                 </p>
 
-                <h3 className="text-xl font-semibold">
-                  {blog.title}
-                </h3>
+                <h3 className="text-xl font-semibold">{blog.title}</h3>
 
                 <p className="text-muted-foreground text-sm line-clamp-3">
                   {blog.description || "No description available"}
@@ -87,9 +114,7 @@ export default function BlogPage() {
         {/* EMPTY STATE */}
         {blogs.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-muted-foreground">
-              No blogs available
-            </p>
+            <p className="text-muted-foreground">No blogs available</p>
           </div>
         )}
       </section>

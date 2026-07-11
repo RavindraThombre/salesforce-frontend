@@ -11,21 +11,28 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "bluecloudmentor-service.onrender.com",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.bluecloudmentor.com",
         pathname: "/uploads/**",
       },
     ],
   },
 
   async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/salesforce-academy",
-        permanent: true,
-        basePath: false,
-      },
-    ];
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/",
+          destination: "/salesforce-academy",
+          permanent: true,
+          basePath: false,
+        },
+      ];
+    }
+    return [];
   },
 
   async rewrites() {
@@ -34,32 +41,31 @@ const nextConfig: NextConfig = {
         {
           source: "/api-proxy/:path*",
           destination: "http://localhost:5000/:path*",
+          basePath: false,
         },
         {
           source: "/auth-api/:path*",
           destination: "http://salesforce-academy.test/:path*",
+          basePath: false,
         },
       ];
     }
 
     // ✅ PROD
-   return [
-  {
-    source: "/api-proxy/:path*",
-    destination: "https://bluecloudmentor-service.onrender.com/:path*",
-    // basePath: false,
-  },
-  {
-    source: "/auth-api/:path*",
-    destination: "https://bluecloudmentor-service.onrender.com/:path*",
-    // basePath: false,
-  },
-  {
-    source: "/salesforce-api/:path*",
-    destination: "https://bluecloudmentor-service.onrender.com/:path*",
-    // basePath: false,
-  },
-];
+    return [
+      {
+        source: "/api-proxy/:path*",
+        destination: "https://api.bluecloudmentor.com/:path*",
+      },
+      {
+        source: "/auth-api/:path*",
+        destination: "https://api.bluecloudmentor.com/:path*",
+      },
+      {
+        source: "/salesforce-api/:path*",
+        destination: "https://api.bluecloudmentor.com/:path*",
+      },
+    ];
   },
 };
 

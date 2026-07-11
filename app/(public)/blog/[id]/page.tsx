@@ -47,16 +47,13 @@ export default function BlogDetailPage() {
 
   return (
     <main className="bg-background text-foreground">
-      
       {/* HEADER */}
       <section className="py-10 max-w-4xl mx-auto px-6">
         <Link href="/blog">
           <Button variant="ghost">← Back to Blog</Button>
         </Link>
 
-        <h1 className="text-4xl font-bold mt-6">
-          {blog.title}
-        </h1>
+        <h1 className="text-4xl font-bold mt-6">{blog.title}</h1>
 
         <p className="text-muted-foreground mt-2">
           {new Date(blog.createdAt).toDateString()}
@@ -67,7 +64,7 @@ export default function BlogDetailPage() {
       {blog.image && (
         <section className="max-w-4xl mx-auto px-6">
           <Image
-            src={`http://localhost:5000${blog.image}`}
+            src={blog.image}
             alt={blog.title}
             width={800}
             height={400}
@@ -83,7 +80,6 @@ export default function BlogDetailPage() {
           dangerouslySetInnerHTML={{ __html: blog.content }}
         />
       </section>
-
     </main>
   );
 }

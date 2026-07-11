@@ -25,7 +25,6 @@ export default function EditBlogPage() {
   const router = useRouter();
 
   const [blog, setBlog] = useState<Blog | null>(null);
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [description, setDescription] = useState("");
@@ -48,7 +47,7 @@ export default function EditBlogPage() {
         setDescription(data.description || "");
 
         if (data.image) {
-          setPreview(`http://localhost:5000${data.image}`);
+          setPreview(data.image);
         }
       } catch (err) {
         console.error(err);
@@ -108,28 +107,23 @@ export default function EditBlogPage() {
 
   return (
     <div className="p-6">
-
       <Card className="max-w-2xl">
         <CardContent className="p-6 space-y-4">
-
           <h1 className="text-xl font-bold">Edit Blog</h1>
 
           {/* TITLE */}
           <div className="space-y-2">
             <Label>Title</Label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
 
           <div className="space-y-2">
-          <Label>Description</Label>
-          <Input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
+            <Label>Description</Label>
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
           {/* IMAGE */}
           <div className="space-y-2">
@@ -157,17 +151,11 @@ export default function EditBlogPage() {
           </div>
 
           {/* BUTTON */}
-          <Button
-            onClick={handleUpdate}
-            disabled={loading}
-            className="w-full"
-          >
+          <Button onClick={handleUpdate} disabled={loading} className="w-full">
             {loading ? "Updating..." : "Update Blog"}
           </Button>
-
         </CardContent>
       </Card>
-
     </div>
   );
 }

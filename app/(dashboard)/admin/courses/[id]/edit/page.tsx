@@ -45,7 +45,7 @@ export default function EditCoursePage() {
             "Discount must be less than price",
             function (value) {
               return !value || value < this.parent.price;
-            }
+            },
           ),
       otherwise: () => Yup.number().notRequired(),
     }),
@@ -123,11 +123,7 @@ export default function EditCoursePage() {
         });
 
         if (res.data.thumbnail) {
-          setPreview(
-            res.data.thumbnail.startsWith("http")
-              ? res.data.thumbnail
-              : `http://localhost:5000${res.data.thumbnail}`
-          );
+          setPreview(res.data.thumbnail);
         }
       } catch (error) {
         console.error(error);
@@ -158,7 +154,6 @@ export default function EditCoursePage() {
           </h1>
 
           <form onSubmit={formik.handleSubmit} className="space-y-4">
-            
             {/* TITLE */}
             <Input
               name="title"
@@ -228,18 +223,16 @@ export default function EditCoursePage() {
                   }}
                 />
 
-                {formik.values.price > 0 &&
-                  formik.values.discountPrice > 0 && (
-                    <p className="text-green-600 text-sm">
-                      {Math.round(
-                        ((formik.values.price -
-                          formik.values.discountPrice) /
-                          formik.values.price) *
-                          100
-                      )}
-                      % OFF
-                    </p>
-                  )}
+                {formik.values.price > 0 && formik.values.discountPrice > 0 && (
+                  <p className="text-green-600 text-sm">
+                    {Math.round(
+                      ((formik.values.price - formik.values.discountPrice) /
+                        formik.values.price) *
+                        100,
+                    )}
+                    % OFF
+                  </p>
+                )}
               </>
             )}
 

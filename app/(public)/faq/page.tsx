@@ -4,16 +4,47 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Link } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function FaqPage() {
   return (
     <main className="bg-background text-foreground">
       {/* HEADER */}
-      <section className="py-20 text-center px-6">
-        <h1 className="text-4xl md:text-5xl font-bold">Frequently Asked Questions</h1>
-        <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-          Find answers to common questions about our Salesforce courses and platform.
-        </p>
+      <section className="relative py-4 md:py-6 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+
+        <div className="relative max-w-6xl mx-auto">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full hover:bg-primary/10"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+            </Link>
+
+            <div>
+              <h2
+                className="text-base sm:text-xl font-semibold tracking-tight capitalize"
+                style={{
+                  fontFamily:
+                    "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
+                }}
+              >
+                Frequently Asked Questions
+              </h2>
+
+              <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-2xl">
+                Find answers to common questions about our Salesforce courses
+                and learning platform.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* FAQ LIST */}

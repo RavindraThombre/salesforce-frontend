@@ -19,37 +19,37 @@ export default function CreateCoursePage() {
   };
 
   // ✅ UPDATED VALIDATION
- const validationSchema = Yup.object({
-  title: Yup.string().required("Course title is required"),
-  description: Yup.string().required("Description is required"),
+  const validationSchema = Yup.object({
+    title: Yup.string().required("Course title is required"),
+    description: Yup.string().required("Description is required"),
 
-  price: Yup.number().when("isFree", {
-    is: false,
-    then: (schema) =>
-      schema
-        .typeError("Price must be a number")
-        .min(1, "Price must be greater than 0")
-        .required("Price is required"),
-    otherwise: () => Yup.number().notRequired(), // ✅ FIX
-  }),
+    price: Yup.number().when("isFree", {
+      is: false,
+      then: (schema) =>
+        schema
+          .typeError("Price must be a number")
+          .min(1, "Price must be greater than 0")
+          .required("Price is required"),
+      otherwise: () => Yup.number().notRequired(), // ✅ FIX
+    }),
 
-  discountPrice: Yup.number().when("isFree", {
-    is: false,
-    then: (schema) =>
-      schema
-        .min(0, "Invalid discount price")
-        .test(
-          "less-than-price",
-          "Discount must be less than price",
-          function (value) {
-            return !value || value < this.parent.price;
-          }
-        ),
-    otherwise: () => Yup.number().notRequired(), // ✅ FIX
-  }),
+    discountPrice: Yup.number().when("isFree", {
+      is: false,
+      then: (schema) =>
+        schema
+          .min(0, "Invalid discount price")
+          .test(
+            "less-than-price",
+            "Discount must be less than price",
+            function (value) {
+              return !value || value < this.parent.price;
+            },
+          ),
+      otherwise: () => Yup.number().notRequired(), // ✅ FIX
+    }),
 
-  thumbnail: Yup.mixed<File>().nullable(),
-});
+    thumbnail: Yup.mixed<File>().nullable(),
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -163,8 +163,8 @@ export default function CreateCoursePage() {
               </select>
             </div>
             {formik.errors.price && (
-  <p className="text-red-500 text-sm">{formik.errors.price}</p>
-)}
+              <p className="text-red-500 text-sm">{formik.errors.price}</p>
+            )}
 
             {/* PRICE (ONLY IF PAID) */}
             {!formik.values.isFree && (
@@ -190,18 +190,16 @@ export default function CreateCoursePage() {
                   }}
                 />
 
-                {formik.values.price > 0 &&
-                  formik.values.discountPrice > 0 && (
-                    <p className="text-green-600 text-sm">
-                      {Math.round(
-                        ((formik.values.price -
-                          formik.values.discountPrice) /
-                          formik.values.price) *
-                          100
-                      )}
-                      % OFF
-                    </p>
-                  )}
+                {formik.values.price > 0 && formik.values.discountPrice > 0 && (
+                  <p className="text-green-600 text-sm">
+                    {Math.round(
+                      ((formik.values.price - formik.values.discountPrice) /
+                        formik.values.price) *
+                        100,
+                    )}
+                    % OFF
+                  </p>
+                )}
               </>
             )}
 

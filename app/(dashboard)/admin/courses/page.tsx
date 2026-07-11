@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,6 @@ const getDiscountPercent = (price: number, discount?: number) => {
   if (!discount || discount >= price) return 0;
   return Math.round(((price - discount) / price) * 100);
 };
-
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 export default function AdminCoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
@@ -91,11 +90,13 @@ export default function AdminCoursesPage() {
               >
                 {/* IMAGE */}
                 {course.thumbnail && (
-                  <div className="relative">
-                    <img
-                      src={`${BASE_URL}${course.thumbnail}`}
+                  <div className="relative w-full h-40">
+                    <Image
+                      src={course.thumbnail}
                       alt={course.title}
-                      className="w-full h-40 object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width:768px) 100vw, 33vw"
                     />
 
                     {/* DISCOUNT BADGE */}

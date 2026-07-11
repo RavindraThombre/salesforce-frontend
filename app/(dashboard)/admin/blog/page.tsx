@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/app/lib/axiosConfig";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type Blog = {
   _id: string;
@@ -48,10 +49,9 @@ export default function AdminBlogPage() {
 
   return (
     <div className="p-6 space-y-6">
-
       {/* HEADER */}
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Blog Posts</h1>
+        <h1 className="text-lg font-bold">Blog Posts</h1>
 
         <Link href="/admin/blog/create">
           <Button>Create Blog</Button>
@@ -70,15 +70,15 @@ export default function AdminBlogPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-3 gap-6">
-
           {blogs.map((blog) => (
             <Card key={blog._id} className="overflow-hidden">
-
               {/* IMAGE */}
               {blog.image ? (
-                <img
-                  src={`http://localhost:5000${blog.image}`}
+                <Image
+                  src={blog.image}
                   alt={blog.title}
+                  width={400}
+                  height={160}
                   className="h-40 w-full object-cover"
                 />
               ) : (
@@ -88,7 +88,6 @@ export default function AdminBlogPage() {
               )}
 
               <CardContent className="p-4 space-y-3">
-
                 {/* TITLE */}
                 <h2 className="font-semibold text-lg line-clamp-2">
                   {blog.title}
@@ -105,7 +104,6 @@ export default function AdminBlogPage() {
 
                 {/* ACTIONS */}
                 <div className="flex gap-2 pt-2">
-
                   <Link href={`/admin/blog/${blog._id}/edit`}>
                     <Button size="sm" variant="outline">
                       Edit
@@ -119,16 +117,12 @@ export default function AdminBlogPage() {
                   >
                     Delete
                   </Button>
-
                 </div>
-
               </CardContent>
             </Card>
           ))}
-
         </div>
       )}
-
     </div>
   );
 }

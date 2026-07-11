@@ -56,7 +56,6 @@ export default function AdminSettingsPage() {
 
   return (
     <div className="p-6 space-y-6">
-
       <h1 className="text-2xl font-bold">Platform Settings</h1>
 
       {/* WEBSITE */}
@@ -84,7 +83,6 @@ export default function AdminSettingsPage() {
             onChange={handleChange}
             placeholder="Phone"
           />
-
         </CardContent>
       </Card>
 
@@ -106,7 +104,6 @@ export default function AdminSettingsPage() {
             onChange={handleChange}
             placeholder="Zoom Secret"
           />
-
         </CardContent>
       </Card>
 
@@ -128,7 +125,6 @@ export default function AdminSettingsPage() {
             onChange={handleChange}
             placeholder="Stripe Key"
           />
-
         </CardContent>
       </Card>
 
@@ -136,7 +132,6 @@ export default function AdminSettingsPage() {
       <Button onClick={handleSave} disabled={loading}>
         {loading ? "Saving..." : "Save All Settings"}
       </Button>
-
     </div>
   );
 }

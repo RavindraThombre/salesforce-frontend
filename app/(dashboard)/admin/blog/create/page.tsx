@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,15 +27,38 @@ export default function CreateBlogPage() {
 
     if (!file) return;
 
+    if (!file.type.startsWith("image/")) {
+      e.target.value = "";
+      toast.error("Only image files are allowed.");
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      e.target.value = "";
+      toast.error("Image must be smaller than 2MB.");
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+    setPreview(url);
     setImage(file);
-    setPreview(URL.createObjectURL(file));
   };
 
   // ✅ CREATE BLOG
   const handleCreate = async () => {
-    // 🔥 VALIDATION
-    if (!title || !content) {
-      toast.error("All fields are required ❌");
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!description.trim()) {
+      toast.error("Description is required");
+      return;
+    }
+    const plainText = content.replace(/<[^>]*>/g, "").trim();
+
+    if (!plainText) {
+      toast.error("Content is required");
       return;
     }
 
@@ -62,7 +85,7 @@ export default function CreateBlogPage() {
       router.push("/admin/blog");
     } catch (error) {
       console.error("Create error:", error);
-      toast.error("Failed to create blog ❌");
+      toast.error("Failed to create blog");
     } finally {
       setLoading(false);
     }
@@ -70,10 +93,8 @@ export default function CreateBlogPage() {
 
   return (
     <div className="p-6">
-
       <Card className="max-w-2xl">
         <CardContent className="p-6 space-y-4">
-
           <h1 className="text-xl font-bold">Create Blog</h1>
 
           {/* TITLE */}
@@ -87,13 +108,13 @@ export default function CreateBlogPage() {
           </div>
 
           <div className="space-y-2">
-  <Label>Description</Label>
-  <Input
-    placeholder="Enter short description"
-    value={description}
-    onChange={(e) => setDescription(e.target.value)}
-  />
-</div>
+            <Label>Description</Label>
+            <Input
+              placeholder="Enter short description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
 
           {/* IMAGE */}
           <div className="space-y-2">
@@ -113,23 +134,17 @@ export default function CreateBlogPage() {
           <div className="space-y-2">
             <Label>Content</Label>
             <RichTextEditor
-    value={content}
-    onChange={(val) => setContent(val)}
-  />
+              value={content}
+              onChange={(val) => setContent(val)}
+            />
           </div>
 
           {/* BUTTON */}
-          <Button
-            onClick={handleCreate}
-            disabled={loading}
-            className="w-full"
-          >
+          <Button onClick={handleCreate} disabled={loading} className="w-full">
             {loading ? "Publishing..." : "Publish Blog"}
           </Button>
-
         </CardContent>
       </Card>
-
     </div>
   );
 }
