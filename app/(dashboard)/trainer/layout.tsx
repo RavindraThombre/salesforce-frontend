@@ -5,5 +5,5 @@ export default function TrainerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ProtectedRoute role="trainer">{children}</ProtectedRoute>;
+  return <ProtectedRoute roles={["trainer"]}>{children}</ProtectedRoute>;
 }
