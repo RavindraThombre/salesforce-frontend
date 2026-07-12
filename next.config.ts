@@ -22,17 +22,14 @@ const nextConfig: NextConfig = {
   },
 
   async redirects() {
-    if (process.env.NODE_ENV === "development") {
-      return [
-        {
-          source: "/",
-          destination: "/salesforce-academy",
-          permanent: true,
-          basePath: false,
-        },
-      ];
-    }
-    return [];
+    return [
+      {
+        source: "/",
+        destination: "/salesforce-academy",
+        permanent: true,
+        basePath: false,
+      },
+    ];
   },
 
   async rewrites() {
