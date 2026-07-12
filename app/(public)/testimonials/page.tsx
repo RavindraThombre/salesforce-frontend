@@ -6,6 +6,7 @@ import { getTestimonials } from "./lib/testimonialApi";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 
 type Testimonial = {
   _id: string;
@@ -16,20 +17,27 @@ type Testimonial = {
 
 export default function TestimonialsPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
+      setLoading(true);
       try {
         const data = await getTestimonials();
         setTestimonials(data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchTestimonials();
   }, []);
 
+  if (loading) {
+    return <SalesforceLoader />;
+  }
   return (
     <main className="bg-background text-foreground">
       {/* HEADER */}

@@ -29,13 +29,11 @@ export default function LoginPage() {
 
   const [loading, setLoading] = useState(false);
 
-  // ✅ handle input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setForm((prev) => ({ ...prev, [id]: value }));
   };
 
-  // ✅ handle login
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -69,9 +67,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold">
-            Welcome back 👋
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Welcome back 👋</CardTitle>
           <p className="text-sm text-muted-foreground">
             Login to your Salesforce Academy account
           </p>
@@ -134,7 +130,10 @@ export default function LoginPage() {
             {/* Signup */}
             <p className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link href="/auth/signup" className="text-primary hover:underline">
+              <Link
+                href="/auth/signup"
+                className="text-primary hover:underline"
+              >
                 Sign up
               </Link>
             </p>

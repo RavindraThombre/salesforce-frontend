@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useParams } from "next/navigation";
 import { getBlogById } from "../lib/blogApi";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 
 type Blog = {
   _id: string;
@@ -21,26 +22,34 @@ export default function BlogDetailPage() {
   const id = params?.id as string;
 
   const [blog, setBlog] = useState<Blog | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
 
     const fetchBlog = async () => {
+      setLoading(true);
       try {
         const data = await getBlogById(id);
         setBlog(data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchBlog();
   }, [id]);
 
+  if (loading) {
+    return <SalesforceLoader />;
+  }
+
   if (!blog) {
     return (
-      <div className="p-10 text-center">
-        <h2 className="text-2xl font-bold">Loading...</h2>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <p className="text-muted-foreground">Blog not found.</p>
       </div>
     );
   }

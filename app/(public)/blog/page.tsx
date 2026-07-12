@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getBlogs } from "./lib/blogApi";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 
 type Blog = {
   _id: string;
@@ -20,19 +21,27 @@ type Blog = {
 export default function BlogPage() {
   const router = useRouter();
   const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
+      setLoading(true);
       try {
         const data = await getBlogs();
         setBlogs(data);
       } catch (err) {
         console.error("Blog fetch error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchBlogs();
+    void fetchBlogs();
   }, []);
+
+  if (loading) {
+    return <SalesforceLoader />;
+  }
 
   return (
     <main className="bg-background text-foreground">

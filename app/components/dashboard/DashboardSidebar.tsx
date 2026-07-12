@@ -13,6 +13,7 @@ import {
   Award,
   Menu,
   Mail,
+  LayoutDashboard,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -27,6 +28,9 @@ export default function DashboardSidebar() {
   const isTrainer = cleanPath.startsWith("/trainer");
 
   const isActive = (path: string) => {
+    if (path === "/") {
+      return cleanPath === "/";
+    }
     if (path === "/admin" || path === "/student" || path === "/trainer") {
       return cleanPath === path;
     }
@@ -74,8 +78,12 @@ export default function DashboardSidebar() {
         {/* ADMIN */}
         {isAdmin && (
           <>
-            <Link href="/admin" className={linkClass("/admin")}>
+            <Link href="/" className={linkClass("/")}>
               <Home size={18} />
+              {!collapsed && "Home"}
+            </Link>
+            <Link href="/admin" className={linkClass("/admin")}>
+              <LayoutDashboard size={18} />
               {!collapsed && "Dashboard"}
             </Link>
 
@@ -147,8 +155,12 @@ export default function DashboardSidebar() {
         {/* STUDENT */}
         {isStudent && (
           <>
-            <Link href="/student" className={linkClass("/student")}>
+            <Link href="/" className={linkClass("/")}>
               <Home size={18} />
+              {!collapsed && "Home"}
+            </Link>
+            <Link href="/student" className={linkClass("/student")}>
+              <LayoutDashboard size={18} />
               {!collapsed && "Dashboard"}
             </Link>
 

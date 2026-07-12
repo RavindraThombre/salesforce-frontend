@@ -28,30 +28,29 @@ export default function CourseDetailPage() {
   const [isEnrolled, setIsEnrolled] = useState(false);
 
   useEffect(() => {
-  if (!id) return;
+    if (!id) return;
 
-  const fetchCourse = async () => {
-    try {
-      const data = await getCourseById(id);
-      setCourse(data);
+    const fetchCourse = async () => {
+      try {
+        const data = await getCourseById(id);
+        setCourse(data);
 
-      const token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
 
-      // ✅ only check if logged in
-      if (token) {
-        const res = await checkEnrollment(id);
-        setIsEnrolled(res.enrolled);
+        // ✅ only check if logged in
+        if (token) {
+          const res = await checkEnrollment(id);
+          setIsEnrolled(res.enrolled);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchCourse();
-}, [id]);
+    fetchCourse();
+  }, [id]);
 
   if (loading) {
     return (
@@ -65,126 +64,161 @@ export default function CourseDetailPage() {
 
   return (
     <main className="bg-background text-foreground">
+      {/* HERO SECTION */}
+      <section className="relative overflow-hidden border-b bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 text-white">
+        {/* Background Blur */}
+        <div className="absolute inset-0">
+          <div className="absolute -top-24 left-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+          <div className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-indigo-500/20 blur-3xl" />
+        </div>
 
-      {/* HEADER */}
-      <section className="py-14 text-center border-b">
-        <h1 className="text-4xl font-bold">{course.title}</h1>
+        <div className="relative max-w-7xl mx-auto px-6 py-16">
+          <div className="grid lg:grid-cols-3 gap-10 items-center">
+            {/* LEFT */}
+            <div className="lg:col-span-2">
+              <div className="flex flex-wrap gap-3 mb-5">
+                <Badge className="bg-blue-600 hover:bg-blue-600">
+                  {course.level}
+                </Badge>
 
-        <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
-          {course.description}
-        </p>
+                <Badge
+                  variant="secondary"
+                  className="bg-white/10 text-white border-0"
+                >
+                  {course.duration || "N/A"}
+                </Badge>
 
-        <div className="flex justify-center gap-3 mt-4">
-          <Badge>{course.level}</Badge>
-          <Badge variant="secondary">
-            {course.duration || "N/A"}
-          </Badge>
+                <Badge
+                  variant="secondary"
+                  className="bg-green-600 text-white border-0"
+                >
+                  Bestseller
+                </Badge>
+              </div>
+
+              <h1 className="text-4xl md:text-5xl font-bold leading-tight">
+                {course.title}
+              </h1>
+
+              <p className="mt-6 text-lg text-slate-300 max-w-3xl leading-8">
+                {course.description}
+              </p>
+
+              <div className="mt-8 flex flex-wrap gap-8">
+                <div>
+                  <p className="text-3xl font-bold">₹{course.price}</p>
+                  <p className="text-slate-400 text-sm">One-time Payment</p>
+                </div>
+
+                <div>
+                  <p className="text-3xl font-bold">
+                    {course.duration || "N/A"}
+                  </p>
+                  <p className="text-slate-400 text-sm">Course Duration</p>
+                </div>
+
+                <div>
+                  <p className="text-3xl font-bold">Live</p>
+                  <p className="text-slate-400 text-sm">Online Classes</p>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT CARD */}
+            <Card className="shadow-2xl border-0 bg-white text-black">
+              <CardContent className="p-7">
+                <p className="text-4xl font-bold text-primary">
+                  ₹{course.price}
+                </p>
+
+                <div className="space-y-3 mt-6">
+                  <div className="flex justify-between text-sm">
+                    <span>Level</span>
+                    <span className="font-medium">{course.level}</span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span>Duration</span>
+                    <span className="font-medium">
+                      {course.duration || "N/A"}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span>Mode</span>
+                    <span className="font-medium">Live + Recorded</span>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span>Certificate</span>
+                    <span className="font-medium">Included</span>
+                  </div>
+                </div>
+
+                {isEnrolled && (
+                  <Badge className="mt-6 bg-green-100 text-green-700">
+                    Already Enrolled
+                  </Badge>
+                )}
+
+                <Button
+                  className="w-full mt-6 h-12 text-base"
+                  disabled={isEnrolled}
+                  onClick={() => {
+                    if (!course) return;
+
+                    const token = localStorage.getItem("token");
+
+                    if (!token || token === "undefined" || token === "null") {
+                      toast.error("Please login to enroll");
+                      localStorage.setItem("redirectAfterLogin", "/checkout");
+                      router.push("/auth/login");
+                      return;
+                    }
+
+                    if (isEnrolled) {
+                      toast.info("You are already enrolled");
+                      return;
+                    }
+
+                    sessionStorage.setItem(
+                      "selectedCourse",
+                      JSON.stringify(course),
+                    );
+
+                    router.push("/checkout");
+                  }}
+                >
+                  {isEnrolled ? "Already Enrolled" : "Enroll Now"}
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
       {/* CONTENT */}
-      <section className="max-w-5xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-8">
-
-        {/* SYLLABUS */}
-        <Card className="md:col-span-2">
-          <CardContent className="p-6">
-            <h2 className="text-2xl font-semibold mb-4">
-              Course Syllabus
-            </h2>
-
-            <ul className="space-y-2 list-disc list-inside text-muted-foreground">
-              {course.syllabus?.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* ENROLL */}
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <h3 className="text-xl font-semibold">Course Fee</h3>
-
-            <p className="text-3xl font-bold text-primary">
-              ₹{course.price}
-            </p>
-
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li>✔ Live Classes (Zoom)</li>
-              <li>✔ Recorded Videos</li>
-              <li>✔ Notes & Assignments</li>
-              <li>✔ Certificate</li>
-              <li>✔ Placement Guidance</li>
-            </ul>
-
-            {/* <Button className="w-full mt-4">
-              Enroll Now
-            </Button> */}
-            
-          <div className="space-y-3">
-
-  {/* ✅ ENROLLED BADGE */}
-  {isEnrolled && (
-    <Badge className="bg-green-100 text-green-700">
-      Enrolled
-    </Badge>
-  )}
-
-  <Button
-    className="w-full"
-    disabled={isEnrolled}
-    onClick={() => {
-  if (!course) return;
-
-  const token = localStorage.getItem("token");
-
-  // 🔥 STRICT CHECK
-  if (!token || token === "undefined" || token === "null") {
-    toast.error("Please login to enroll");
-
-    localStorage.setItem("redirectAfterLogin", "/checkout");
-
-    router.push("/auth/login"); // ❌ REMOVE setTimeout
-    return;
-  }
-
-  if (isEnrolled) {
-    toast.info("You are already enrolled");
-    return;
-  }
-
-  sessionStorage.setItem(
-    "selectedCourse",
-    JSON.stringify(course)
-  );
-
-  router.push("/checkout");
-}}
-  >
-    {isEnrolled ? "Already Enrolled" : "Enroll Now"}
-  </Button>
-
-</div>
-          </CardContent>
-        </Card>
-
-      </section>
 
       {/* CTA */}
-      <section className="bg-muted py-14 text-center">
-        <h2 className="text-3xl font-bold">
-          Start Your Salesforce Journey
-        </h2>
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-indigo-700 text-white text-center">
+        <div className="max-w-3xl mx-auto px-6">
+          <h2 className="text-4xl font-bold">
+            Ready to Become a Salesforce Professional?
+          </h2>
 
-        <p className="mt-3 text-muted-foreground">
-          Join thousands of students learning Salesforce with expert trainers.
-        </p>
+          <p className="mt-5 text-lg text-blue-100">
+            Learn from industry experts, build real-world projects, earn
+            certification, and prepare for high-paying Salesforce careers.
+          </p>
 
-        <Button size="lg" className="mt-6">
-          Join Now
-        </Button>
+          <Button
+            size="lg"
+            className="mt-8 bg-white text-blue-700 hover:bg-slate-100"
+          >
+            Start Learning Today
+          </Button>
+        </div>
       </section>
-
     </main>
   );
 }

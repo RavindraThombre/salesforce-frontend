@@ -152,71 +152,97 @@ export default function CoursesPage() {
                 }}
                 viewport={{ once: true }}
               >
-                <Card className="group overflow-hidden rounded-3xl border-border/40 bg-background/80 backdrop-blur-sm shadow-md hover:shadow-2xl hover:-translate-y-3 transition-all duration-500 h-full flex flex-col">
+                <Card className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                   {/* IMAGE */}
-                  <div className="relative overflow-hidden">
+                  <div className="relative h-56 overflow-hidden">
                     <Image
                       src={course.image || "/courses/admin.jpg"}
                       alt={course.title}
-                      width={400}
-                      height={250}
-                      className="h-48 w-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
 
-                    {/* BADGE */}
-                    {isFree ? (
-                      <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow">
-                        FREE
-                      </span>
-                    ) : (
-                      discount > 0 && (
-                        <span className="absolute top-3 left-3 bg-green-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow">
-                          {discount}% OFF
+                    {(isFree || discount > 0) && (
+                      <div className="absolute top-4 left-4">
+                        <span
+                          className={`rounded-full px-4 py-2 text-xs font-bold text-white shadow-lg ${
+                            isFree
+                              ? "bg-blue-600"
+                              : "bg-gradient-to-r from-green-500 to-green-700"
+                          }`}
+                        >
+                          {isFree ? "FREE" : `${discount}% OFF`}
                         </span>
-                      )
+                      </div>
                     )}
                   </div>
-
-                  <CardContent className="p-5 flex-1 space-y-3">
-                    <h3 className="text-lg font-bold group-hover:text-primary transition-colors duration-300">
+                  <CardContent className="flex flex-1 flex-col p-6">
+                    {/* CATEGORY */}
+                    <span className="text-[14px] font-semibold uppercase tracking-wider text-primary">
                       {course.title}
-                    </h3>
+                    </span>
 
-                    <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                    {/* RATING */}
+                    <div className="mt-0 flex items-center gap-2">
+                      <span className="text-yellow-500">★</span>
+                      <span className="text-xs text-muted-foreground font-semibold">
+                        4.9
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        (1,500+ reviews)
+                      </span>
+                    </div>
+
+                    {/* DESCRIPTION */}
+                    <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">
                       {course.description}
                     </p>
 
-                    <span className="inline-block text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
-                      {course.level}
-                    </span>
+                    {/* INSTRUCTOR */}
+                    <div className="mt-3 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 font-semibold text-primary">
+                          {course.title.charAt(0)}
+                        </div>
 
-                    {/* PRICE */}
-                    <div className="flex items-center gap-2 pt-2">
-                      {isFree ? (
-                        <span className="text-lg font-bold text-blue-600">
-                          FREE
-                        </span>
-                      ) : (
-                        <>
-                          <span className="text-lg font-bold text-primary">
+                        <div>
+                          <p className="text-xs font-semibold">
+                            Blue Cloud Mentor
+                          </p>
+
+                          <p className="text-xs text-muted-foreground">
+                            Instructor
+                          </p>
+                        </div>
+                      </div>
+
+                      {!isFree && (
+                        <div className="text-right gap-2">
+                          <p className="text-sm font-bold text-primary">
                             ₹{formatCurrency(course.price)}
-                          </span>
+                          </p>
 
                           {course.originalPrice && (
-                            <span className="text-sm line-through text-muted-foreground">
+                            <p className="text-[11px] text-muted-foreground line-through">
                               ₹{formatCurrency(course.originalPrice)}
-                            </span>
+                            </p>
                           )}
-                        </>
+                        </div>
+                      )}
+
+                      {isFree && (
+                        <p className="text-sm font-semibold text-blue-600">
+                          FREE
+                        </p>
                       )}
                     </div>
                   </CardContent>
-
-                  <CardFooter className="p-5 pt-0">
+                  <CardFooter className="p-5 pt-4">
                     <Link href={`/courses/${course._id}`} className="w-full">
-                      <Button className="w-full rounded-2xl group/btn">
-                        {isFree ? "Enroll Free" : "View Details"}
-                        <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                      <Button className="w-full rounded-xl h-11">
+                        {isFree ? "Enroll Now" : "View Details"}
+
+                        <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </Link>
                   </CardFooter>

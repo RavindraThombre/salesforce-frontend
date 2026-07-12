@@ -1,19 +1,19 @@
-type CourseProgress = {
+export type CourseProgress = {
   courseName: string;
   progress: number;
 };
 
-type ActivityItem = {
+export type ActivityItem = {
   text: string;
   date: string;
 };
 
-type NotificationItem = {
+export type NotificationItem = {
   message: string;
   createdAt: string;
 };
 
-type UpcomingClass = {
+export type UpcomingClass = {
   topic?: string;
   date?: string;
   time?: string;

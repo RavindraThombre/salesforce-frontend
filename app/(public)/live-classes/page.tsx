@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import { set } from "date-fns";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 
 type LiveClass = {
   _id: string;
@@ -45,8 +47,9 @@ export default function LiveClassesPage() {
 
   useEffect(() => {
     const fetchClasses = async () => {
+      setLoading(true);
       try {
-        const res = await apiClient.get("/public/live-classes"); // 👈 your API
+        const res = await apiClient.get("/public/live-classes");
         setLiveClasses(res.data);
       } catch (err) {
         console.error(err);
@@ -55,7 +58,7 @@ export default function LiveClassesPage() {
       }
     };
 
-    fetchClasses();
+    void fetchClasses();
   }, []);
 
   const handleJoin = (cls: LiveClass) => {
@@ -107,7 +110,7 @@ export default function LiveClassesPage() {
   };
 
   if (loading) {
-    return <p className="text-center py-20">Loading classes...</p>;
+    return <SalesforceLoader />;
   }
   return (
     <main className="bg-background text-foreground">

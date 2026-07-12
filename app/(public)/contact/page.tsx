@@ -107,9 +107,9 @@ export default function ContactPage() {
           </p>
 
           <div className="space-y-3 text-muted-foreground *:text-sm">
-            <p>📍 Pune, Maharashtra, India</p>
+            <p>📍Ravet Nigdi Pradhikaran, Pune, Maharashtra, India</p>
             <p>📧 support@salesforceacademy.com</p>
-            <p>📞 +91 98765 43210</p>
+            <p>📞 +91 96232 35335</p>
           </div>
         </div>
 
