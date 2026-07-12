@@ -6,28 +6,26 @@ import { useEffect } from "react";
 
 type Props = {
   children: React.ReactNode;
-  role?: "admin" | "student" | "trainer";
+  roles?: string[];
 };
 
-export default function ProtectedRoute({ children, role }: Props) {
+export default function ProtectedRoute({ children, roles }: Props) {
   const { user, loading } = useUser();
   const router = useRouter();
 
   const token =
-    typeof window !== "undefined"
-      ? localStorage.getItem("token")
-      : null;
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+  console.log("User:", user);
+  console.log("Role:", user?.role);
+  console.log("Allowed Roles:", roles);
+  console.log("Authorized:", roles?.includes(user?.role ?? ""));
 
   // ✅ DERIVED AUTH
   const isAuthenticated =
-    !!token &&
-    token !== "undefined" &&
-    token !== "null" &&
-    !!user;
+    !!token && token !== "undefined" && token !== "null" && !!user;
 
-  const isAuthorized =
-    isAuthenticated &&
-    (!role || user.role === role);
+  const isAuthorized = isAuthenticated && (!roles || roles.includes(user.role));
 
   useEffect(() => {
     if (loading) return;

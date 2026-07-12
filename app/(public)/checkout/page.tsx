@@ -108,7 +108,7 @@ export default function CheckoutPage() {
 
   if (!course) return <p className="p-6">No course selected</p>;
   return (
-    <ProtectedRoute role="student">
+    <ProtectedRoute roles={["student", "admin"]}>
       <div className="p-10 flex justify-center">
         <Card className="max-w-md w-full">
           <CardContent className="p-6 space-y-4">
