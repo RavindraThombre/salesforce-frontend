@@ -61,10 +61,9 @@ export default function CheckoutPage() {
         }, 1000);
         return;
       }
-
       const order = await createOrder(course._id, course.price);
       const options = {
-        key: process.env.RAZORPAY_KEY_ID,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: course.price * 100,
         currency: "INR",
         name: "Your LMS",
