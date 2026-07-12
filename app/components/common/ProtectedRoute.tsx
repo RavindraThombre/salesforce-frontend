@@ -15,12 +15,6 @@ export default function ProtectedRoute({ children, roles }: Props) {
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  console.log("User:", user);
-  console.log("Role:", user?.role);
-  console.log("Allowed Roles:", roles);
-  console.log("Authorized:", roles?.includes(user?.role ?? ""));
-
   // ✅ DERIVED AUTH
   const isAuthenticated =
     !!token && token !== "undefined" && token !== "null" && !!user;

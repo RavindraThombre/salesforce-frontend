@@ -2,15 +2,23 @@ export {};
 
 declare global {
   interface RazorpayOptions {
-    key: string | undefined;
-    amount: number;
-    currency: string;
-    name: string;
-    description: string;
-    order_id: string;
-    handler: (response: RazorpayResponse) => void;
+    key: string;
+    order_id?: string;
+    amount?: number;
+    currency?: string;
+    name?: string;
+    description?: string;
+    handler?: (response: RazorpayResponse) => void | Promise<void>;
     theme?: {
       color?: string;
+    };
+    modal?: {
+      ondismiss?: () => void;
+    };
+    prefill?: {
+      name?: string;
+      email?: string;
+      contact?: string;
     };
   }
 
@@ -21,7 +29,8 @@ declare global {
   }
 
   interface RazorpayInstance {
-    open: () => void;
+    open(): void;
+    on(event: string, callback: (response: unknown) => void): void;
   }
 
   interface Window {

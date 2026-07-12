@@ -61,33 +61,28 @@ export default function CheckoutPage() {
         }, 1000);
         return;
       }
+
       const order = await createOrder(course._id, course.price);
+      const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY;
+
+      if (!razorpayKey) {
+        toast.error("Razorpay key is missing");
+        return;
+      }
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-        amount: course.price * 100,
-        currency: "INR",
-        name: "Your LMS",
-        description: course.title,
+        key: razorpayKey,
         order_id: order.orderId,
 
-        handler: async function (response: RazorpayResponse) {
-          try {
-            await verifyPayment({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              courseId: course._id,
-            });
+        name: "BlueCloudMentor",
+        description: course.title,
 
-            toast.success("Payment successful 🎉");
-
-            setTimeout(() => {
-              window.location.href = "/student";
-            }, 1000);
-          } catch (err) {
-            console.error(err);
-            toast.error("Verification failed");
-          }
+        handler: async (response: RazorpayResponse) => {
+          await verifyPayment({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            courseId: course._id,
+          });
         },
 
         theme: {
@@ -96,6 +91,14 @@ export default function CheckoutPage() {
       };
 
       const rzp = new window.Razorpay(options);
+      rzp.on("payment.failed", function (response: unknown) {
+        console.log("Payment Failed:", response);
+      });
+
+      rzp.on("modal.closed", function () {
+        console.log("Modal closed");
+      });
+
       rzp.open();
     } catch (err) {
       console.error(err);
