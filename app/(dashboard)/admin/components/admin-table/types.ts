@@ -10,22 +10,16 @@ import { ReactNode } from "react";
 export interface AdminDataTableProps<T extends object> {
   columns: ColumnDef<T, unknown>[];
   data: T[];
-
   loading?: boolean;
-
   searchable?: boolean;
   searchPlaceholder?: string;
-
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
   selectable?: boolean;
-
   pageSize?: number;
-
   emptyMessage?: string;
-
   toolbar?: ReactNode;
-
   onRefresh?: () => void;
-
   renderRowActions?: (row: T) => ReactNode;
 }
 

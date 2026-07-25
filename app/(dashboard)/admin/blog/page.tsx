@@ -1,128 +1,49 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { apiClient } from "@/app/lib/axiosConfig";
-import { toast } from "sonner";
-import Image from "next/image";
-
-type Blog = {
-  _id: string;
-  title: string;
-  image?: string;
-  createdAt: string;
-};
+import { useBlogs } from "./lib/useBlogs";
+import BlogHeader from "./components/BlogHeader";
+import BlogStats from "./components/BlogStats";
+import BlogTable from "./components/BlogTable";
 
 export default function AdminBlogPage() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { blogs, loading, deleteBlog } = useBlogs();
 
-  const fetchBlogs = async () => {
-    try {
-      setLoading(true);
-      const res = await apiClient.get("/blogs", {
-        headers: { "Cache-Control": "no-cache" },
-      });
-      setBlogs(res.data);
-    } catch (error) {
-      toast.error("Failed to load blogs ❌");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const blogsThisMonth = blogs.filter((blog) => {
+    const created = new Date(blog.createdAt);
+    const now = new Date();
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
+    return (
+      created.getMonth() === now.getMonth() &&
+      created.getFullYear() === now.getFullYear()
+    );
+  }).length;
 
-  const deleteBlog = async (id: string) => {
-    try {
-      await apiClient.delete(`/blogs/${id}`);
-      setBlogs((prev) => prev.filter((b) => b._id !== id));
-      toast.success("Blog deleted ✅");
-    } catch {
-      toast.error("Delete failed ❌");
-    }
-  };
+  const latestBlogDate =
+    blogs.length > 0
+      ? new Date(
+          blogs
+            .slice()
+            .sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
+            )[0].createdAt,
+        ).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        })
+      : undefined;
 
   return (
-    <div className="p-6 space-y-6">
-      {/* HEADER */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-lg font-bold">Blog Posts</h1>
+    <div className="space-y-6">
+      <BlogHeader totalBlogs={blogs.length} />
 
-        <Link href="/admin/blog/create">
-          <Button>Create Blog</Button>
-        </Link>
-      </div>
-
-      {/* LOADING */}
-      {loading ? (
-        <p>Loading blogs...</p>
-      ) : blogs.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-lg font-medium">No blogs found</p>
-          <p className="text-sm text-muted-foreground">
-            Start by creating your first blog ✍️
-          </p>
-        </div>
-      ) : (
-        <div className="grid md:grid-cols-3 gap-6">
-          {blogs.map((blog) => (
-            <Card key={blog._id} className="overflow-hidden">
-              {/* IMAGE */}
-              {blog.image ? (
-                <Image
-                  src={blog.image}
-                  alt={blog.title}
-                  width={400}
-                  height={160}
-                  className="h-40 w-full object-cover"
-                />
-              ) : (
-                <div className="h-40 bg-muted flex items-center justify-center text-sm text-muted-foreground">
-                  No Image
-                </div>
-              )}
-
-              <CardContent className="p-4 space-y-3">
-                {/* TITLE */}
-                <h2 className="font-semibold text-lg line-clamp-2">
-                  {blog.title}
-                </h2>
-
-                {/* DATE */}
-                <p className="text-xs text-muted-foreground">
-                  {new Date(blog.createdAt).toLocaleDateString("en-IN", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </p>
-
-                {/* ACTIONS */}
-                <div className="flex gap-2 pt-2">
-                  <Link href={`/admin/blog/${blog._id}/edit`}>
-                    <Button size="sm" variant="outline">
-                      Edit
-                    </Button>
-                  </Link>
-
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => deleteBlog(blog._id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <BlogStats
+        totalBlogs={blogs.length}
+        blogsThisMonth={blogsThisMonth}
+        latestBlogDate={latestBlogDate}
+      />
+      <BlogTable blogs={blogs} loading={loading} onDelete={deleteBlog} />
     </div>
   );
 }

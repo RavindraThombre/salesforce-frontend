@@ -40,7 +40,7 @@ export default function AdminCoursesPage() {
   };
 
   useEffect(() => {
-    fetchCourses();
+    void fetchCourses();
   }, []);
 
   const deleteCourse = async (id: string) => {
@@ -58,7 +58,7 @@ export default function AdminCoursesPage() {
         <h1 className="text-2xl font-bold"></h1>
 
         <Link href="/admin/courses/create">
-          <Button>Create Course</Button>
+          <Button className="cursor-pointer">Create Course</Button>
         </Link>
       </div>
 
@@ -151,7 +151,11 @@ export default function AdminCoursesPage() {
                   {/* ACTIONS */}
                   <div className="flex gap-2 pt-2">
                     <Link href={`/admin/courses/${course._id}/edit`}>
-                      <Button size="sm" variant="outline">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="cursor-pointer"
+                      >
                         Edit
                       </Button>
                     </Link>
@@ -159,6 +163,7 @@ export default function AdminCoursesPage() {
                     <Button
                       size="sm"
                       variant="destructive"
+                      className="cursor-pointer"
                       onClick={() => deleteCourse(course._id)}
                     >
                       Delete

@@ -1,16 +1,31 @@
 "use client";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  CalendarDays,
+  Clock3,
+  ExternalLink,
+  Radio,
+  Timer,
+  UserRound,
+  Video,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { useUser } from "@/app/context/UserContext";
+import { apiClient } from "@/app/lib/axiosConfig";
+import SalesforceLoader from "@/app/components/common/SalesforceLoader";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useUser } from "@/app/context/UserContext";
-import { useRouter } from "next/navigation";
-import { apiClient } from "@/app/lib/axiosConfig";
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
-import { set } from "date-fns";
-import SalesforceLoader from "@/app/components/common/SalesforceLoader";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  formatDateTimeIST,
+  formatTime,
+} from "@/app/(dashboard)/admin/live-classes/lib/getTimeParts";
 
 type LiveClass = {
   _id: string;
@@ -27,6 +42,7 @@ type LiveClass = {
     name: string;
   };
 
+  topic?: string;
   date: string;
   time: string;
   level: string;
@@ -36,23 +52,84 @@ type LiveClass = {
 
   isLive: boolean;
   isUpcoming: boolean;
+
   startTime: string;
+  endTime: string;
+};
+
+type ClassStatus = "LIVE" | "UPCOMING" | "ENDED";
+
+const getClassStatus = (cls: LiveClass, currentTime: number): ClassStatus => {
+  const start = new Date(cls.startTime).getTime();
+  const end = new Date(cls.endTime).getTime();
+
+  if (currentTime < start) {
+    return "UPCOMING";
+  }
+
+  if (currentTime >= start && currentTime < end) {
+    return "LIVE";
+  }
+
+  return "ENDED";
+};
+
+const getCountdown = (startTime: string, currentTime: number) => {
+  const start = new Date(startTime).getTime();
+  const diff = start - currentTime;
+
+  if (diff <= 0) {
+    return null;
+  }
+
+  const totalSeconds = Math.ceil(diff / 1000);
+
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (days > 0) {
+    return `${days}d ${hours}h ${minutes}m`;
+  }
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  }
+
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+
+  return `${seconds}s`;
 };
 
 export default function LiveClassesPage() {
   const { user } = useUser();
+
   const router = useRouter();
+
   const [liveClasses, setLiveClasses] = useState<LiveClass[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Used to automatically update Live/Upcoming/Ended
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  /**
+   * Fetch Classes
+   */
   useEffect(() => {
     const fetchClasses = async () => {
       setLoading(true);
+
       try {
         const res = await apiClient.get("/public/live-classes");
+
         setLiveClasses(res.data);
       } catch (err) {
         console.error(err);
+
+        toast.error("Failed to load live classes");
       } finally {
         setLoading(false);
       }
@@ -61,24 +138,58 @@ export default function LiveClassesPage() {
     void fetchClasses();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1_000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const sortedClasses = useMemo(() => {
+    const priority: Record<ClassStatus, number> = {
+      LIVE: 1,
+      UPCOMING: 2,
+      ENDED: 3,
+    };
+
+    return [...liveClasses].sort((a, b) => {
+      const statusA = getClassStatus(a, currentTime);
+
+      const statusB = getClassStatus(b, currentTime);
+
+      return priority[statusA] - priority[statusB];
+    });
+  }, [liveClasses, currentTime]);
+
   const handleJoin = (cls: LiveClass) => {
+    const status = getClassStatus(cls, Date.now());
+
+    if (status === "UPCOMING") {
+      toast.error("Class has not started yet");
+
+      return;
+    }
+
+    if (status === "ENDED") {
+      toast.error("This class has already ended");
+
+      return;
+    }
+
     if (!user) {
       router.push("/auth/login");
+
       return;
     }
 
-    if (!cls.isLive) {
-      toast.error("Class not started yet");
-      return;
-    }
-
-    // ✅ FREE CLASS
+    // FREE CLASS
     if (cls.isFree) {
-      window.open(cls.zoomLink, "_blank");
+      window.open(cls.zoomLink, "_blank", "noopener,noreferrer");
+
       return;
     }
 
-    // ✅ FIX courseId extraction
     const courseId =
       typeof cls.courseId === "string" ? cls.courseId : cls.courseId?._id;
 
@@ -89,159 +200,273 @@ export default function LiveClassesPage() {
     const isEnrolled = enrolledCourses.includes(courseId);
 
     if (isEnrolled) {
-      window.open(cls.zoomLink, "_blank");
+      window.open(cls.zoomLink, "_blank", "noopener,noreferrer");
     } else {
       router.push(`/courses/${courseId}`);
     }
   };
 
-  const getCountdown = (startTime: string) => {
-    const now = new Date().getTime();
-    const start = new Date(startTime).getTime();
-
-    const diff = start - now;
-
-    if (diff <= 0) return null;
-
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(minutes / 60);
-
-    return hours > 0 ? `${hours}h ${minutes % 60}m left` : `${minutes}m left`;
-  };
-
   if (loading) {
     return <SalesforceLoader />;
   }
+
   return (
-    <main className="bg-background text-foreground">
-      {/* HEADER */}
-      <section className="relative py-4 md:py-6 px-6 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+    <main className="min-h-screen bg-slate-50/50">
+      {/* ================= HEADER ================= */}
 
-        <div className="relative max-w-6xl mx-auto">
-          <div className="flex items-center gap-3">
-            <Link href="/">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="rounded-full hover:bg-primary/10"
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-            </Link>
+      <section className="border-b bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="flex items-start gap-4">
+            <Button
+              variant="outline"
+              size="icon"
+              className="shrink-0 rounded-full"
+              asChild
+            >
+              <Link href="/">
+                <ArrowLeft className="h-4 w-4" />
+              </Link>
+            </Button>
 
-            <div>
-              <h2
-                className="text-base sm:text-xl font-semibold tracking-tight capitalize"
-                style={{
-                  fontFamily:
-                    "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
-                }}
-              >
-                Live Classes Schedule
-              </h2>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+                  <Video className="h-5 w-5 text-primary" />
+                </div>
 
-              <p className="mt-1 text-xs sm:text-sm text-muted-foreground max-w-2xl">
-                Join our instructor-led Salesforce classes live on Zoom and
-                learn from industry experts.
-              </p>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+                    Live Classes
+                  </h1>
+
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Join instructor-led Salesforce sessions and learn directly
+                    from industry experts.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
-      {/* CLASS LIST */}
-      <section className="max-w-6xl mx-auto px-6 pb-20">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {liveClasses.map((cls) => (
-            <Card key={cls._id} className="hover:shadow-lg transition">
-              <CardContent className="p-6 space-y-3">
-                {/* TITLE + BADGE */}
 
-                <div className="flex justify-between items-center">
-                  <h3 className="text-xl font-semibold">
-                    {cls.course ||
-                      (typeof cls.courseId !== "string" && cls.courseId?.title)}
-                  </h3>
+      {/* ================= CLASSES ================= */}
 
-                  <div className="flex gap-2">
-                    {/* 🔴 LIVE */}
-                    {cls.isLive && (
-                      <Badge className="bg-red-600 text-white animate-pulse">
-                        LIVE 🔴
-                      </Badge>
-                    )}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {sortedClasses.length === 0 ? (
+          <Card className="border-dashed shadow-none">
+            <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
+                <CalendarDays className="h-6 w-6 text-muted-foreground" />
+              </div>
 
-                    {/* ⏳ UPCOMING */}
-                    {!cls.isLive && cls.isUpcoming && (
-                      <Badge variant="secondary">Upcoming</Badge>
-                    )}
+              <h3 className="font-semibold">No live classes scheduled</h3>
 
-                    {/* 💰 FREE / PAID */}
-                    <Badge variant={cls.isFree ? "default" : "destructive"}>
-                      {cls.isFree ? "Free" : "Paid"}
-                    </Badge>
-                  </div>
-                </div>
+              <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+                New Salesforce live training sessions will appear here when they
+                are scheduled.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {sortedClasses.map((cls) => {
+              const status = getClassStatus(cls, currentTime);
 
-                {/* TRAINER */}
-                <p className="text-sm text-muted-foreground">
-                  Trainer:{" "}
-                  <span className="font-medium">
-                    {cls.trainer || cls.trainerId?.name}
-                  </span>
-                </p>
+              const countdown =
+                status === "UPCOMING"
+                  ? getCountdown(cls.startTime, currentTime)
+                  : null;
 
-                {/* DETAILS */}
-                <div className="flex flex-wrap gap-2">
-                  <Badge>{cls.level}</Badge>
-
-                  <Badge variant="secondary">
-                    {new Date(cls.date).toLocaleDateString("en-IN")}
-                  </Badge>
-
-                  <Badge variant="outline">{cls.time}</Badge>
-                </div>
-
-                {cls.isUpcoming && (
-                  <p className="text-sm text-muted-foreground">
-                    Starts in: {getCountdown(cls.startTime)}
-                  </p>
-                )}
-              </CardContent>
-
-              <CardFooter className="p-6 pt-0">
-                <Button
-                  className="w-full"
-                  disabled={!cls.isLive && !cls.isUpcoming}
-                  onClick={() => handleJoin(cls)}
+              return (
+                <Card
+                  key={cls._id}
+                  className="group overflow-hidden border-slate-200 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                 >
-                  {cls.isLive
-                    ? "Join Now"
-                    : cls.isUpcoming
-                      ? "Starts Soon"
-                      : "Expired"}
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                  {/* STATUS BAR */}
+
+                  {status === "LIVE" && (
+                    <div className="flex items-center justify-center gap-2 bg-red-600 px-4 py-2 text-xs font-semibold text-white">
+                      <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
+                      LIVE NOW
+                    </div>
+                  )}
+
+                  <CardContent className="p-6">
+                    {/* HEADER */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="line-clamp-2 text-lg font-semibold text-slate-900">
+                          {cls.course ||
+                            (typeof cls.courseId !== "string" &&
+                              cls.courseId?.title)}
+                        </h3>
+
+                        {cls.topic && (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {cls.topic}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-2">
+                        {/* CLASS STATUS */}
+                        {status === "LIVE" && (
+                          <Badge className="gap-1.5 bg-red-600 text-white hover:bg-red-600">
+                            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                            Live
+                          </Badge>
+                        )}
+
+                        {status === "UPCOMING" && (
+                          <Badge variant="secondary">Upcoming</Badge>
+                        )}
+
+                        {status === "ENDED" && (
+                          <Badge variant="outline">Ended</Badge>
+                        )}
+
+                        {/* PAYMENT STATUS */}
+                        <Badge
+                          variant="outline"
+                          className={
+                            cls.isFree
+                              ? "border-green-200 bg-green-50 text-green-700"
+                              : "border-slate-200 bg-slate-50 text-slate-700"
+                          }
+                        >
+                          {cls.isFree ? "Free" : "Paid"}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="mt-5 space-y-3 border-t pt-4">
+                      {/* TRAINER */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <UserRound className="h-4 w-4 text-muted-foreground" />
+
+                        <span className="text-muted-foreground">Trainer</span>
+
+                        <span className="ml-auto font-medium">
+                          {cls.trainer || cls.trainerId?.name}
+                        </span>
+                      </div>
+
+                      {/* DATE */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <CalendarDays className="h-4 w-4 text-muted-foreground" />
+
+                        <span className="text-muted-foreground">Date</span>
+
+                        <span className="ml-auto font-medium">
+                          {new Date(cls.date).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}
+                        </span>
+                      </div>
+
+                      {/* SCHEDULED TIME */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <Clock3 className="h-4 w-4 text-muted-foreground" />
+
+                        <span className="text-muted-foreground">Time</span>
+
+                        <span className="ml-auto font-medium">
+                          {formatTime(cls.time)} IST
+                        </span>
+                      </div>
+
+                      {/* START TIME */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <Clock3 className="h-4 w-4 text-muted-foreground" />
+
+                        <span className="text-muted-foreground">Starts At</span>
+
+                        <span className="ml-auto text-right font-medium">
+                          {formatDateTimeIST(cls.startTime)}
+                        </span>
+                      </div>
+
+                      {/* END TIME */}
+                      <div className="flex items-center gap-3 text-sm">
+                        <Clock3 className="h-4 w-4 text-muted-foreground" />
+
+                        <span className="text-muted-foreground">Ends At</span>
+
+                        <span className="ml-auto text-right font-medium">
+                          {formatDateTimeIST(cls.endTime)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* COUNTDOWN */}
+
+                    {status === "UPCOMING" && countdown && (
+                      <div className="mt-5 flex items-center gap-3 rounded-lg bg-muted/60 px-4 py-3">
+                        <Timer className="h-4 w-4 text-primary" />
+
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            Class starts in
+                          </p>
+
+                          <p className="text-sm font-semibold">{countdown}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* LIVE */}
+
+                    {status === "LIVE" && (
+                      <div className="mt-5 flex items-center gap-3 rounded-lg bg-red-50 px-4 py-3 text-red-700">
+                        <Radio className="h-4 w-4 animate-pulse" />
+
+                        <p className="text-sm font-medium">Class is live now</p>
+                      </div>
+                    )}
+
+                    {/* ACTION */}
+
+                    <Button
+                      className="mt-5 w-full"
+                      variant={status === "LIVE" ? "default" : "secondary"}
+                      disabled={status !== "LIVE"}
+                      onClick={() => handleJoin(cls)}
+                    >
+                      {status === "LIVE" ? (
+                        <>
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          Join Class
+                        </>
+                      ) : status === "UPCOMING" ? (
+                        <>
+                          <Clock3 className="mr-2 h-4 w-4" />
+                          Starts Soon
+                        </>
+                      ) : (
+                        "Class Ended"
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </section>
 
-      {/* INFO */}
-      <section className="bg-muted/40 py-12">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2
-            className="text-xl sm:text-2xl md:text-3xl font-semibold"
-            style={{
-              fontFamily:
-                "var(--wes-g-font-family-display), Inter, system-ui, sans-serif",
-            }}
-          >
-            Don’t Miss a Class
+      {/* ================= INFO ================= */}
+
+      <section className="border-t bg-white py-12">
+        <div className="mx-auto max-w-3xl px-6 text-center">
+          <h2 className="text-2xl font-semibold tracking-tight">
+            Don&apos;t Miss a Class
           </h2>
 
-          <p className="mt-2 text-sm text-muted-foreground max-w-2xl mx-auto">
-            Enroll in a Salesforce course to receive Zoom meeting links, class
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground">
+            Enroll in a Salesforce course to receive meeting links, class
             reminders, and access to live instructor-led sessions.
           </p>
 

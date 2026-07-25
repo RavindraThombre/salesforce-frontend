@@ -16,7 +16,6 @@ export const getTrainerCourses = async () => {
   return res.data;
 };
 
-
 /* ===============================
    🔐 ADMIN TRAINER MANAGEMENT
 ================================ */
@@ -40,5 +39,16 @@ export const createTrainer = async (data: {
 // ✅ Delete trainer
 export const deleteTrainer = async (id: string) => {
   const res = await apiClient.delete(`/trainer/${id}`);
+  return res.data;
+};
+
+export const updateTrainer = async (
+  id: string,
+  data: {
+    name: string;
+    email: string;
+  },
+) => {
+  const res = await apiClient.put(`/trainers/${id}`, data);
   return res.data;
 };

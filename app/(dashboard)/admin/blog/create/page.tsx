@@ -1,50 +1,67 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 import { apiClient } from "@/app/lib/axiosConfig";
-import { toast } from "sonner";
-import RichTextEditor from "@/app/components/common/RichTextEditor";
+
+import BlogPageHeader from "./components/BlogPageHeader";
+import BlogBasicInfo from "./components/BlogBasicInfo";
+import BlogImageUpload from "./components/BlogImageUpload";
+import BlogContentEditor from "./components/BlogContentEditor";
+import BlogPublishCard from "./components/BlogPublishCard";
+
 export default function CreateBlogPage() {
   const router = useRouter();
 
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [description, setDescription] = useState("");
+  const [content, setContent] = useState("");
+
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
+
   const [loading, setLoading] = useState(false);
 
-  // ✅ HANDLE IMAGE
+  const handleFile = (file: File) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Only JPG, JPEG, PNG and WEBP images are allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    if (preview?.startsWith("blob:")) {
+      URL.revokeObjectURL(preview);
+    }
+
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      e.target.value = "";
-      toast.error("Only image files are allowed.");
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      e.target.value = "";
-      toast.error("Image must be smaller than 2MB.");
-      return;
-    }
-
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    setImage(file);
+    handleFile(file);
   };
 
-  // ✅ CREATE BLOG
+  const handleRemoveImage = () => {
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+
+    setImage(null);
+    setPreview(null);
+  };
+
   const handleCreate = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
@@ -55,6 +72,7 @@ export default function CreateBlogPage() {
       toast.error("Description is required");
       return;
     }
+
     const plainText = content.replace(/<[^>]*>/g, "").trim();
 
     if (!plainText) {
@@ -66,11 +84,12 @@ export default function CreateBlogPage() {
       setLoading(true);
 
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
-      formData.append("description", description);
 
-      if (image) {
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("content", content);
+
+      if (image instanceof File) {
         formData.append("image", image);
       }
 
@@ -80,11 +99,11 @@ export default function CreateBlogPage() {
         },
       });
 
-      toast.success("Blog created successfully ✅");
+      toast.success("Blog created successfully");
 
       router.push("/admin/blog");
     } catch (error) {
-      console.error("Create error:", error);
+      console.error(error);
       toast.error("Failed to create blog");
     } finally {
       setLoading(false);
@@ -92,59 +111,39 @@ export default function CreateBlogPage() {
   };
 
   return (
-    <div className="p-6">
-      <Card className="max-w-2xl">
-        <CardContent className="p-6 space-y-4">
-          <h1 className="text-xl font-bold">Create Blog</h1>
+    <div className="mx-auto max-w-7xl space-y-6 p-6">
+      <BlogPageHeader
+        loading={loading}
+        onPublish={handleCreate}
+        mode="create"
+      />
 
-          {/* TITLE */}
-          <div className="space-y-2">
-            <Label>Title</Label>
-            <Input
-              placeholder="Enter blog title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
+      <div className="grid gap-6 xl:grid-cols-3">
+        <div className="space-y-6 xl:col-span-2">
+          <BlogBasicInfo
+            title={title}
+            description={description}
+            onTitleChange={setTitle}
+            onDescriptionChange={setDescription}
+          />
 
-          <div className="space-y-2">
-            <Label>Description</Label>
-            <Input
-              placeholder="Enter short description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
+          <BlogImageUpload
+            preview={preview}
+            onImageChange={handleImageChange}
+            onRemoveImage={handleRemoveImage}
+          />
 
-          {/* IMAGE */}
-          <div className="space-y-2">
-            <Label>Blog Image</Label>
-            <Input type="file" accept="image/*" onChange={handleImageChange} />
+          <BlogContentEditor value={content} onChange={setContent} />
+        </div>
 
-            {preview && (
-              <img
-                src={preview}
-                alt="preview"
-                className="w-full h-40 object-cover rounded"
-              />
-            )}
-          </div>
-
-          {/* CONTENT (RICH TEXT) */}
-          <div className="space-y-2">
-            <Label>Content</Label>
-            <RichTextEditor
-              value={content}
-              onChange={(val) => setContent(val)}
-            />
-          </div>
-
-          {/* BUTTON */}
-          <Button onClick={handleCreate} disabled={loading} className="w-full">
-            {loading ? "Publishing..." : "Publish Blog"}
-          </Button>
-        </CardContent>
-      </Card>
+        <BlogPublishCard
+          title={title}
+          description={description}
+          preview={preview}
+          loading={loading}
+          onPublish={handleCreate}
+        />
+      </div>
     </div>
   );
 }

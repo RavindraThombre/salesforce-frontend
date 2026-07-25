@@ -28,23 +28,22 @@ import type { AdminDataTableProps } from "./types";
 export default function AdminDataTable<TData extends object>({
   columns,
   data,
-
   loading = false,
-
   searchable = true,
   searchPlaceholder = "Search...",
-
   pageSize = 10,
-
   emptyMessage = "No records found.",
-
   toolbar,
-
   onRefresh,
+  searchValue,
+  onSearchChange,
 }: AdminDataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
-  const [globalFilter, setGlobalFilter] = React.useState("");
+  const [internalSearch, setInternalSearch] = React.useState("");
+
+  const globalFilter = searchValue ?? internalSearch;
+  const setGlobalFilter = onSearchChange ?? setInternalSearch;
 
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
