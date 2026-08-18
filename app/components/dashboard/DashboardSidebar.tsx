@@ -14,6 +14,7 @@ import {
   Menu,
   Mail,
   LayoutDashboard,
+  Briefcase,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -115,6 +116,13 @@ export default function DashboardSidebar() {
               <CreditCard size={18} />
               {!collapsed && "Payments"}
             </Link>
+            <Link
+              href="/admin/recruitment"
+              className={linkClass("/admin/recruitment")}
+            >
+              <Briefcase size={18} />
+              {!collapsed && "Recruitment"}
+            </Link>
 
             <Link href="/admin/blog" className={linkClass("/admin/blog")}>
               <BookOpen size={18} />
@@ -170,6 +178,14 @@ export default function DashboardSidebar() {
             >
               <BookOpen size={18} />
               {!collapsed && "My Courses"}
+            </Link>
+
+            <Link
+              href="/student/my-applications"
+              className={linkClass("/student/my-applications")}
+            >
+              <Briefcase size={18} />
+              {!collapsed && "My Applications"}
             </Link>
 
             <Link
