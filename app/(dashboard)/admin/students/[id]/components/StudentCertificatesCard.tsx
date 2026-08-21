@@ -5,12 +5,19 @@ import { Award, Download, FileBadge, ShieldCheck } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Certificate } from "../page";
 
 type Props = {
-  certificates: string[];
+  certificates: Certificate[];
 };
 
 export default function StudentCertificatesCard({ certificates }: Props) {
+  const handleDownload = (certificateUrl?: string) => {
+    if (!certificateUrl) return;
+
+    window.open(certificateUrl, "_blank");
+  };
+
   return (
     <Card className="overflow-hidden rounded-3xl border shadow-sm transition-all hover:shadow-lg">
       {/* Header */}
@@ -43,7 +50,7 @@ export default function StudentCertificatesCard({ certificates }: Props) {
             <h3 className="text-lg font-semibold">No Certificates Yet</h3>
 
             <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-              {"The student hasn't earned any certificates yet."}
+              The student has not earned any certificates yet.
             </p>
           </div>
         ) : (
@@ -69,7 +76,7 @@ export default function StudentCertificatesCard({ certificates }: Props) {
             <div className="space-y-4">
               {certificates.map((certificate, index) => (
                 <div
-                  key={index}
+                  key={certificate._id ?? index}
                   className="flex items-center justify-between rounded-2xl border bg-muted/20 p-4 transition hover:bg-muted/40"
                 >
                   <div className="flex items-center gap-4">
@@ -78,15 +85,32 @@ export default function StudentCertificatesCard({ certificates }: Props) {
                     </div>
 
                     <div>
-                      <h3 className="font-semibold">{certificate}</h3>
+                      <h3 className="font-semibold">
+                        {certificate.courseId?.title ?? "Course Certificate"}
+                      </h3>
 
                       <p className="text-sm text-muted-foreground">
                         Successfully Completed
                       </p>
+
+                      {certificate.issuedAt && (
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Issued:{" "}
+                          {new Date(certificate.issuedAt).toLocaleDateString(
+                            "en-IN",
+                          )}
+                        </p>
+                      )}
                     </div>
                   </div>
 
-                  <Button variant="outline" size="sm" className="rounded-xl">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl"
+                    disabled={!certificate.certificateUrl}
+                    onClick={() => handleDownload(certificate.certificateUrl)}
+                  >
                     <Download className="mr-2 h-4 w-4" />
                     Download
                   </Button>

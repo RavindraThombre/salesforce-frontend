@@ -47,7 +47,7 @@ export default function Footer() {
             <div className="space-y-3 text-sm sm:text-[15px] text-muted-foreground w-full max-w-xs">
               <div className="flex items-start sm:items-center justify-center sm:justify-start gap-3">
                 <Mail className="h-4 w-4 text-primary mt-1 sm:mt-0 shrink-0" />
-                <span className="break-all">support@bluecloudementor.com</span>
+                <span className="break-all">support@bluecloudmentor.com</span>
               </div>
 
               <div className="flex items-center justify-center sm:justify-start gap-3">

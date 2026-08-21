@@ -3,7 +3,6 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { apiClient } from "@/app/lib/axiosConfig";
-import { Card, CardContent } from "@/components/ui/card";
 import StudentProfileCard from "./components/StudentProfileCard";
 import StudentCoursesCard from "./components/StudentCoursesCard";
 import StudentPaymentsCard from "./components/StudentPaymentsCard";
@@ -17,17 +16,54 @@ type Course = {
   title: string;
 };
 
-type StudentDetailResponse = {
+type Student = {
   _id: string;
-  userId: {
-    name: string;
-    email: string;
-  };
+  name: string;
+  email: string;
+  phone: string;
   city: string;
+  avatar: string;
+  role: string;
+  status: string;
+  createdAt: string;
+};
 
-  courses?: Course[];
-  payments?: number[];
-  certificates?: string[];
+type Payment = {
+  _id: string;
+  courseId: Course | null;
+  amount: number;
+  status: "pending" | "completed" | "failed";
+  paymentType: "FREE" | "PAID";
+  razorpayOrderId?: string;
+  razorpayPaymentId?: string;
+  createdAt: string;
+};
+
+export type Certificate = {
+  _id?: string;
+  courseId?: Course;
+  certificateUrl?: string;
+  issuedAt?: string;
+};
+
+type Progress = {
+  courseId?: Course;
+  percentage: number;
+};
+
+type StudentDetailResponse = {
+  student: Student;
+  enrolledCourses: Course[];
+  payments: Payment[];
+  certificates: Certificate[];
+  progress: Progress[];
+  statistics: {
+    enrolledCoursesCount: number;
+    totalPayments: number;
+    certificatesCount: number;
+    paymentsCount: number;
+    completedPaymentsCount: number;
+  };
 };
 
 export default function StudentDetailPage() {
@@ -43,10 +79,12 @@ export default function StudentDetailPage() {
           headers: { "Cache-Control": "no-cache" },
         });
         setData({
-          ...res.data,
-          courses: res.data.courses ?? [],
+          student: res.data.student,
+          enrolledCourses: res.data.enrolledCourses ?? [],
           payments: res.data.payments ?? [],
           certificates: res.data.certificates ?? [],
+          progress: res.data.progress ?? [],
+          statistics: res.data.statistics,
         });
       } catch (error) {
         console.error("Error fetching student:", error);
@@ -60,31 +98,26 @@ export default function StudentDetailPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <StudentHeader studentName={data.userId.name} />
+      <StudentHeader studentName={data.student.name} />
 
       <StudentStats
-        totalCourses={data.courses?.length ?? 0}
-        totalPayments={(data.payments ?? []).reduce(
-          (sum, amount) => sum + amount,
-          0,
-        )}
-        totalCertificates={data.certificates?.length ?? 0}
+        totalCourses={data.statistics.enrolledCoursesCount}
+        totalPayments={data.statistics.totalPayments}
+        totalCertificates={data.statistics.certificatesCount}
       />
 
       <StudentProfileCard
-        student={{
-          ...data,
-          courses: data.courses ?? [],
-          payments: data.payments ?? [],
-          certificates: data.certificates ?? [],
-        }}
+        student={data.student}
+        courses={data.enrolledCourses}
+        payments={data.payments}
+        certificates={data.certificates}
       />
 
-      <StudentCoursesCard courses={data.courses ?? []} />
+      <StudentCoursesCard courses={data.enrolledCourses} />
 
-      <StudentPaymentsCard payments={data.payments ?? []} />
+      <StudentPaymentsCard payments={data.payments} />
 
-      <StudentCertificatesCard certificates={data.certificates ?? []} />
+      <StudentCertificatesCard certificates={data.certificates} />
     </div>
   );
 }

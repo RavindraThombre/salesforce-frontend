@@ -10,6 +10,7 @@ import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import CourseRating from "./components/CourseRating";
 
 type Course = {
   _id: string;
@@ -19,6 +20,9 @@ type Course = {
   price: number;
   originalPrice?: number;
   image?: string;
+
+  averageRating?: number;
+  totalReviews?: number;
 };
 
 const formatCurrency = (value: number) => value.toLocaleString("en-IN");
@@ -183,15 +187,7 @@ export default function CoursesPage() {
                     </span>
 
                     {/* RATING */}
-                    <div className="mt-0 flex items-center gap-2">
-                      <span className="text-yellow-500">★</span>
-                      <span className="text-xs text-muted-foreground font-semibold">
-                        4.9
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        (1,500+ reviews)
-                      </span>
-                    </div>
+                    <CourseRating courseId={course._id} />
 
                     {/* DESCRIPTION */}
                     <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">

@@ -5,12 +5,33 @@ import { CreditCard, IndianRupee, Receipt, Wallet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+type Course = {
+  _id: string;
+  title: string;
+};
+
+type Payment = {
+  _id: string;
+  amount: number;
+  status: "pending" | "completed" | "failed";
+  paymentType: "FREE" | "PAID";
+  createdAt?: string;
+  courseId: Course | null;
+};
+
 type Props = {
-  payments: number[];
+  payments: Payment[];
 };
 
 export default function StudentPaymentsCard({ payments }: Props) {
-  const totalAmount = payments.reduce((sum, amount) => sum + amount, 0);
+  const completedPayments = payments.filter(
+    (payment) => payment.status === "completed",
+  );
+
+  const totalAmount = completedPayments.reduce(
+    (sum, payment) => sum + (Number(payment.amount) || 0),
+    0,
+  );
 
   return (
     <Card className="overflow-hidden rounded-3xl border shadow-sm transition-all hover:shadow-lg">
@@ -44,7 +65,7 @@ export default function StudentPaymentsCard({ payments }: Props) {
             <h3 className="font-semibold">No Payments Found</h3>
 
             <p className="mt-2 text-sm text-muted-foreground">
-              {"This student hasn't made any payments yet."}
+              This student has not made any payments yet.
             </p>
           </div>
         ) : (
@@ -55,42 +76,70 @@ export default function StudentPaymentsCard({ payments }: Props) {
 
               <h2 className="mt-2 flex items-center gap-2 text-3xl font-bold text-primary">
                 <IndianRupee className="h-7 w-7" />
+
                 {totalAmount.toLocaleString("en-IN")}
               </h2>
             </div>
 
             {/* Payment List */}
             <div className="space-y-4">
-              {payments.map((amount, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between rounded-2xl border bg-muted/20 p-4 transition hover:bg-muted/40"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="rounded-xl bg-primary/10 p-3">
-                      <Receipt className="h-5 w-5 text-primary" />
+              {payments.map((payment) => {
+                const isCompleted = payment.status === "completed";
+
+                const isFailed = payment.status === "failed";
+
+                return (
+                  <div
+                    key={payment._id}
+                    className="flex items-center justify-between rounded-2xl border bg-muted/20 p-4 transition hover:bg-muted/40"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="rounded-xl bg-primary/10 p-3">
+                        <Receipt className="h-5 w-5 text-primary" />
+                      </div>
+
+                      <div>
+                        <p className="font-medium">
+                          {payment.courseId?.title || "Course Payment"}
+                        </p>
+
+                        <p className="text-sm text-muted-foreground">
+                          {payment.paymentType === "FREE"
+                            ? "Free Enrollment"
+                            : "Paid Course"}
+                        </p>
+
+                        {payment.createdAt && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {new Date(payment.createdAt).toLocaleDateString(
+                              "en-IN",
+                            )}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
-                    <div>
-                      <p className="font-medium">Transaction #{index + 1}</p>
-
-                      <p className="text-sm text-muted-foreground">
-                        Payment Successful
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-primary">
+                        ₹{Number(payment.amount || 0).toLocaleString("en-IN")}
                       </p>
+
+                      <Badge
+                        variant={isCompleted ? "default" : "secondary"}
+                        className={
+                          isCompleted
+                            ? "mt-1 bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950 dark:text-green-400"
+                            : isFailed
+                              ? "mt-1 bg-red-100 text-red-700 hover:bg-red-100"
+                              : "mt-1"
+                        }
+                      >
+                        {payment.status}
+                      </Badge>
                     </div>
                   </div>
-
-                  <div className="text-right">
-                    <p className="text-lg font-bold text-primary">
-                      ₹{amount.toLocaleString("en-IN")}
-                    </p>
-
-                    <Badge className="mt-1 bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950 dark:text-green-400">
-                      Paid
-                    </Badge>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </>
         )}
