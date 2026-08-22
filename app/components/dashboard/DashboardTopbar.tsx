@@ -33,25 +33,23 @@ export default function DashboardTopbar() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   /* ---------------- FETCH ---------------- */
- useEffect(() => {
-  const fetchNotifications = async () => {
-    const res = await apiClient.get<NotificationItem[]>("/notifications");
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const res = await apiClient.get<NotificationItem[]>("/notifications");
 
-    setNotifications(
-      (res.data ?? []).sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() -
-          new Date(a.createdAt).getTime()
-      )
-    );
-  };
+      setNotifications(
+        (res.data ?? []).sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        ),
+      );
+    };
 
-  fetchNotifications(); // ✅ ADD THIS
+    fetchNotifications(); // ✅ ADD THIS
 
-  const interval = setInterval(fetchNotifications, 15000);
-  return () => clearInterval(interval);
-}, []);
- 
+    const interval = setInterval(fetchNotifications, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   /* ---------------- UNREAD COUNT ---------------- */
 
@@ -60,21 +58,17 @@ export default function DashboardTopbar() {
   /* ---------------- ACTIONS ---------------- */
 
   const markAsRead = async (id: string) => {
-    await apiClient.put(`/notifications/${id}/read`)
+    await apiClient.put(`/notifications/${id}/read`);
 
     setNotifications((prev) =>
-      prev.map((n) =>
-        n._id === id ? { ...n, isRead: true } : n
-      )
+      prev.map((n) => (n._id === id ? { ...n, isRead: true } : n)),
     );
   };
 
   const markAllAsRead = async () => {
-    await apiClient.put("/notifications/read-all")
+    await apiClient.put("/notifications/read-all");
 
-    setNotifications((prev) =>
-      prev.map((n) => ({ ...n, isRead: true }))
-    );
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   if (!user) return null;
@@ -85,63 +79,141 @@ export default function DashboardTopbar() {
     nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
 
   const handleLogout = () => {
-  // ✅ REMOVE TOKEN
-  localStorage.removeItem("token");
+    // ✅ REMOVE TOKEN
+    localStorage.removeItem("token");
 
-  // ✅ REMOVE ANY STORED DATA
-  localStorage.removeItem("redirectAfterLogin");
-  sessionStorage.removeItem("selectedCourse");
+    // ✅ REMOVE ANY STORED DATA
+    localStorage.removeItem("redirectAfterLogin");
+    sessionStorage.removeItem("selectedCourse");
 
-  // ✅ CLEAR CONTEXT
-  logout();
+    // ✅ CLEAR CONTEXT
+    logout();
 
-  // ✅ REDIRECT
-  router.push("/login");
-};
+    // ✅ REDIRECT
+    router.push("/login");
+  };
 
   const title =
-    user.role === "admin"
-      ? "Admin Dashboard"
-      : `${firstName} Dashboard`;
+    user.role === "admin" ? "Admin Dashboard" : `${firstName} Dashboard`;
 
   return (
-    <div className="h-16 border-b flex items-center justify-between px-6 bg-background">
+    <div className="flex h-16 w-full items-center justify-between overflow-hidden border-b bg-background px-2 min-[390px]:px-3 sm:px-4 md:px-5">
+      <div className="min-w-0 flex-1 overflow-hidden pt-2 md:pt-1.5">
+        <h2
+          className="
+      truncate
+      text-sm
+      font-semibold
+      leading-tight
+      min-[390px]:text-[15px]
+      sm:text-base
+      md:text-base
+    "
+        >
+          {title}
+        </h2>
 
-      {/* LEFT */}
-      <div className="flex flex-col gap-1">
-      <h2 className="font-semibold text-lg mt-3">{title}</h2>
-      <Breadcrumb />
-    </div>
-
+        <div className="mt-0.5 min-w-0 overflow-hidden">
+          <Breadcrumb />
+        </div>
+      </div>
       {/* RIGHT */}
-      <div className="flex items-center gap-4">
-
-        <ThemeToggle />
+      <div
+        className="
+      ml-1
+      flex
+      shrink-0
+      items-center
+      gap-0.5
+      min-[390px]:ml-2
+      min-[390px]:gap-1
+      sm:gap-2
+      md:gap-3
+    "
+      >
+        {/* THEME */}
+        <div className="shrink-0 scale-90 min-[390px]:scale-100">
+          <ThemeToggle />
+        </div>
 
         {/* ================= NOTIFICATIONS ================= */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="relative p-2 rounded-md hover:bg-muted">
-              <Bell size={20} />
+            <button
+              type="button"
+              className="
+              relative
+              flex
+              h-8
+              w-8
+              shrink-0
+              items-center
+              justify-center
+              rounded-md
+              transition-colors
+              hover:bg-muted
+              min-[390px]:h-9
+              min-[390px]:w-9
+              sm:h-10
+              sm:w-10
+            "
+              aria-label="Notifications"
+            >
+              <Bell
+                className="
+                h-4
+                w-4
+                min-[390px]:h-[18px]
+                min-[390px]:w-[18px]
+                sm:h-5
+                sm:w-5
+              "
+              />
 
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded-full">
-                  {unreadCount}
+                <span
+                  className="
+                  absolute
+                  -right-0.5
+                  -top-0.5
+                  flex
+                  min-w-4
+                  items-center
+                  justify-center
+                  rounded-full
+                  bg-red-500
+                  px-1
+                  text-[8px]
+                  leading-4
+                  text-white
+                  min-[390px]:text-[9px]
+                  sm:text-[10px]
+                "
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
                 </span>
               )}
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-80 p-0">
-
-            {/* HEADER */}
-            <div className="flex justify-between items-center px-4 py-3">
-              <span className="font-semibold">Notifications</span>
+          <DropdownMenuContent
+            align="end"
+            className="
+            w-[calc(100vw-16px)]
+            max-w-80
+            overflow-hidden
+            p-0
+            min-[390px]:w-[calc(100vw-24px)]
+            sm:w-80
+          "
+          >
+            <div className="flex items-center justify-between gap-2 px-3 py-3 sm:px-4">
+              <span className="truncate font-semibold">Notifications</span>
 
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-xs text-primary hover:underline"
+                  className="shrink-0 text-xs text-primary hover:underline"
                 >
                   Mark all read
                 </button>
@@ -150,11 +222,9 @@ export default function DashboardTopbar() {
 
             <DropdownMenuSeparator />
 
-            {/* LIST */}
-            <div className="max-h-80 overflow-y-auto">
-
+            <div className="max-h-[60dvh] overflow-x-hidden overflow-y-auto">
               {notifications.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-6">
+                <p className="py-6 text-center text-sm text-muted-foreground">
                   No notifications
                 </p>
               ) : (
@@ -162,22 +232,22 @@ export default function DashboardTopbar() {
                   <div
                     key={n._id}
                     onClick={() => markAsRead(n._id)}
-                    className={`px-4 py-3 cursor-pointer border-b flex gap-2 ${
-                      !n.isRead
-                        ? "bg-blue-50 dark:bg-blue-900/20"
-                        : ""
+                    className={`flex cursor-pointer gap-2 overflow-hidden border-b px-3 py-3 sm:px-4 ${
+                      !n.isRead ? "bg-blue-50 dark:bg-blue-900/20" : ""
                     }`}
                   >
                     {!n.isRead && (
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                      <div className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
                     )}
 
-                    <div>
-                      <p className="text-sm font-medium">{n.title}</p>
-                      <p className="text-xs text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{n.title}</p>
+
+                      <p className="line-clamp-2 text-xs text-muted-foreground">
                         {n.desc}
                       </p>
-                      <span className="text-[10px] text-muted-foreground">
+
+                      <span className="block truncate text-[10px] text-muted-foreground">
                         {new Date(n.createdAt).toLocaleString()}
                       </span>
                     </div>
@@ -185,29 +255,58 @@ export default function DashboardTopbar() {
                 ))
               )}
             </div>
-
           </DropdownMenuContent>
         </DropdownMenu>
 
         {/* ================= PROFILE ================= */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-semibold">
+            <button
+              type="button"
+              className="
+              flex
+              h-8
+              w-8
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              bg-primary
+              text-[10px]
+              font-semibold
+              text-white
+              min-[390px]:h-9
+              min-[390px]:w-9
+              min-[390px]:text-xs
+              sm:text-sm
+            "
+              aria-label="Profile menu"
+            >
               {initial}
             </button>
           </DropdownMenuTrigger>
 
-          <DropdownMenuContent align="end" className="w-64">
-            <DropdownMenuLabel className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+          <DropdownMenuContent
+            align="end"
+            className="
+            w-[calc(100vw-16px)]
+            max-w-64
+            overflow-hidden
+            min-[390px]:w-[calc(100vw-24px)]
+            sm:w-64
+          "
+          >
+            <DropdownMenuLabel className="flex min-w-0 items-center gap-2">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm text-white">
                 {initial}
               </div>
 
-              <div className="flex flex-col">
-                <span className="text-sm font-medium truncate">
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium">
                   {user.email}
                 </span>
-                <span className="text-xs text-muted-foreground capitalize">
+
+                <span className="truncate text-xs capitalize text-muted-foreground">
                   {user.role}
                 </span>
               </div>
@@ -217,28 +316,25 @@ export default function DashboardTopbar() {
 
             <DropdownMenuItem
               onClick={() =>
-               router.push(
-                user.role === "admin"
-                  ? "/admin/settings"
-                  : user.role === "trainer"
-                  ? "/trainer/profile"
-                  : "/student/profile"
-              )}
+                router.push(
+                  user.role === "admin"
+                    ? "/admin/settings"
+                    : user.role === "trainer"
+                      ? "/trainer/profile"
+                      : "/student/profile",
+                )
+              }
             >
-              <User size={16} className="mr-2" />
+              <User size={16} className="mr-2 shrink-0" />
               Profile
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={handleLogout}
-              className="text-red-500"
-            >
-              <LogOut size={16} className="mr-2" />
+            <DropdownMenuItem onClick={handleLogout} className="text-red-500">
+              <LogOut size={16} className="mr-2 shrink-0" />
               Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
       </div>
     </div>
   );

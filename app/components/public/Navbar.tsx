@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Menu, X } from "lucide-react";
+import { Bell, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -25,6 +25,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import ThemeToggle from "../ThemeToggle";
@@ -37,7 +38,7 @@ export default function Navbar() {
   const router = useRouter();
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur">
-      <div className="max-w-9xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="mx-auto flex h-14 w-full max-w-9xl items-center justify-between px-4 sm:h-16 sm:px-6">
         {/* LOGO */}
         <Link href="/" className="group flex items-center gap-3 leading-tight">
           {/* LOGO */}
@@ -245,45 +246,37 @@ export default function Navbar() {
         </div>
 
         {/* MOBILE MENU */}
-        {/* MOBILE MENU */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+            <Button variant="ghost" size="icon" className="shrink-0 md:hidden">
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
 
           <SheetContent
             side="right"
-            className="
-      flex
-      h-[calc(100vh-2rem)]
-      w-[calc(100vw-2rem)]
-      max-w-sm
-      flex-col
-      rounded-l-2xl
-      p-0
-      sm:hidden
-    "
+            className="flex h-[calc(100svh-12px)] max-h-[calc(100svh-12px)] w-[80vw] max-w-[300px] flex-col rounded-none p-0 sm:hidden"
           >
             {/* HEADER */}
-            <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
+            <div className="flex h-[52px] shrink-0 items-center justify-between border-b px-4">
               <div>
-                <h2 className="text-base font-semibold">Menu</h2>
+                <SheetTitle className="text-sm font-semibold leading-tight">
+                  Menu
+                </SheetTitle>
 
-                <p className="mt-0.5 text-xs text-muted-foreground">
+                <p className="mt-0.5 text-[10px] leading-tight text-muted-foreground">
                   Explore BlueCloudMentor
                 </p>
               </div>
             </div>
 
             {/* SCROLLABLE MENU */}
-            <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-4">
+            <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2">
               <div className="flex flex-col gap-1">
                 <SheetClose asChild>
                   <Link
                     href="/"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Home
                   </Link>
@@ -292,7 +285,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/courses"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Courses
                   </Link>
@@ -301,7 +294,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/blog"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Blog
                   </Link>
@@ -310,7 +303,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/about"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     About
                   </Link>
@@ -319,7 +312,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/contact"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Contact
                   </Link>
@@ -328,7 +321,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/live-classes"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Live Classes
                   </Link>
@@ -337,7 +330,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/testimonials"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Testimonials
                   </Link>
@@ -346,7 +339,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/faq"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     FAQ
                   </Link>
@@ -355,7 +348,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/careers"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Careers
                   </Link>
@@ -364,7 +357,7 @@ export default function Navbar() {
                 <SheetClose asChild>
                   <Link
                     href="/pricing"
-                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium transition-colors hover:bg-muted"
                   >
                     Pricing
                   </Link>
@@ -373,9 +366,9 @@ export default function Navbar() {
             </nav>
 
             {/* FIXED FOOTER */}
-            <div className="shrink-0 border-t bg-background p-4">
-              <div className="mb-4 flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
+            <div className="shrink-0 border-t bg-background px-3 py-2">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">
                   Appearance
                 </span>
 
@@ -383,15 +376,15 @@ export default function Navbar() {
               </div>
 
               {!user ? (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-2">
                   <SheetClose asChild>
-                    <Button variant="outline" asChild className="h-10">
+                    <Button variant="outline" asChild className="h-9 text-xs">
                       <Link href="/auth/login">Login</Link>
                     </Button>
                   </SheetClose>
 
                   <SheetClose asChild>
-                    <Button asChild className="h-10">
+                    <Button asChild className="h-9 text-xs">
                       <Link href="/auth/signup">Sign Up</Link>
                     </Button>
                   </SheetClose>
@@ -399,7 +392,7 @@ export default function Navbar() {
               ) : (
                 <SheetClose asChild>
                   <Button
-                    className="w-full"
+                    className="h-9 w-full text-xs"
                     onClick={() => {
                       router.push(
                         user.role === "admin"
@@ -420,29 +413,5 @@ export default function Navbar() {
         </Sheet>
       </div>
     </header>
-  );
-}
-
-function ListItem({
-  title,
-  children,
-  href,
-}: {
-  title: string;
-  children: React.ReactNode;
-  href: string;
-}) {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className="block space-y-1 rounded-md p-3 hover:bg-muted"
-        >
-          <div className="text-sm font-medium">{title}</div>
-          <p className="text-sm text-muted-foreground">{children}</p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
   );
 }

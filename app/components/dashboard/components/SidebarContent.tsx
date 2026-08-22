@@ -47,7 +47,7 @@ export default function SidebarContent({
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col bg-background">
+    <div className="flex flex-col">
       {/* HEADER */}
       <div
         className={`flex h-[64px] shrink-0 items-center border-b px-7.5 ${

@@ -8,14 +8,10 @@ import SidebarContent from "./components/SidebarContent";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
-
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-
   const cleanPath = pathname.replace(/^\/salesforce-academy/, "") || "/";
-
   const isAdmin = cleanPath === "/admin" || cleanPath.startsWith("/admin/");
-
   const isStudent =
     cleanPath === "/student" || cleanPath.startsWith("/student/");
 
@@ -75,7 +71,7 @@ export default function DashboardSidebar() {
 
       {/* MOBILE SIDEBAR */}
       <aside
-        className={`fixed inset-y-0 left-0 z-[60] flex h-dvh w-[min(85vw,320px)] flex-col overflow-hidden border-r bg-background shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
+        className={`fixed left-0 top-0 z-[60] flex h-[100dvh] max-h-[100dvh] w-[min(82vw,320px)] flex-col overflow-hidden border-r bg-background shadow-2xl transition-transform duration-300 ease-in-out md:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
