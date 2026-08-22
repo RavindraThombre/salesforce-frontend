@@ -92,38 +92,46 @@ export default function StudentDashboard() {
   const activity = data.activity ?? [];
 
   return (
-    <div className="space-y-8">
-      {/* Dashboard Header */}
-      <DashboardHeader />
+    <div className="w-full min-w-0 overflow-x-hidden px-0 py-1 sm:py-2">
+      <div className="w-full min-w-0 space-y-5 sm:space-y-6 md:space-y-8">
+        {/* Dashboard Header */}
+        <DashboardHeader />
 
-      {/* Stats */}
-      <DashboardStats
-        totalCourses={data.totalCourses}
-        totalLiveClasses={data.totalLiveClasses}
-        totalCertificates={data.totalCertificates}
-      />
+        {/* Stats */}
+        <DashboardStats
+          totalCourses={data.totalCourses}
+          totalLiveClasses={data.totalLiveClasses}
+          totalCertificates={data.totalCertificates}
+        />
 
-      {/* Upcoming Live Class */}
-      <UpcomingClassCard
-        upcoming={upcoming}
-        isLive={isLive}
-        isJoinWindow={isJoinWindow}
-        isBeforeJoinWindow={isBeforeJoinWindow}
-        isEnded={isEnded}
-        classStart={classStart}
-        now={now}
-        formatTime={formatTime}
-      />
+        {/* Upcoming Live Class */}
+        <UpcomingClassCard
+          upcoming={upcoming}
+          isLive={isLive}
+          isJoinWindow={isJoinWindow}
+          isBeforeJoinWindow={isBeforeJoinWindow}
+          isEnded={isEnded}
+          classStart={classStart}
+          now={now}
+          formatTime={formatTime}
+        />
 
-      {/* Progress + Notifications */}
-      <div className="grid gap-6 xl:grid-cols-2">
-        <CourseProgressCard courseProgress={courseProgress} />
+        {/* Progress + Notifications */}
+        <div className="grid w-full min-w-0 grid-cols-1 gap-5 sm:gap-6 xl:grid-cols-2">
+          <div className="min-w-0">
+            <CourseProgressCard courseProgress={courseProgress} />
+          </div>
 
-        <NotificationsCard notifications={notifications} />
+          <div className="min-w-0">
+            <NotificationsCard notifications={notifications} />
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="w-full min-w-0">
+          <ActivityCard activity={activity} />
+        </div>
       </div>
-
-      {/* Recent Activity */}
-      <ActivityCard activity={activity} />
     </div>
   );
 }

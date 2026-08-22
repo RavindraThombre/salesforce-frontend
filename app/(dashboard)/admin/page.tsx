@@ -1,4 +1,5 @@
 "use client";
+
 import { apiClient } from "@/app/lib/axiosConfig";
 import { useEffect, useState } from "react";
 
@@ -18,8 +19,17 @@ type DashboardData = {
   totalClasses: number;
   totalRevenue: number;
   totalTrainers: number;
-  studentGrowthData: { month: string; students: number }[];
-  revenueData: { month: string; revenue: number }[];
+
+  studentGrowthData: {
+    month: string;
+    students: number;
+  }[];
+
+  revenueData: {
+    month: string;
+    revenue: number;
+  }[];
+
   recentUsers: {
     name: string;
     email: string;
@@ -65,46 +75,90 @@ export default function AdminDashboard() {
 
   if (!data) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex min-h-[60vh] w-full items-center justify-center px-4">
         <div className="text-center">
-          <h2 className="text-xl font-semibold">Unable to load dashboard</h2>
+          <h2 className="text-lg font-semibold sm:text-xl">
+            Unable to load dashboard
+          </h2>
 
-          <p className="mt-2 text-muted-foreground">Please try again later.</p>
+          <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+            Please try again later.
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <DashboardHeader />
+    <main className="w-full max-w-full overflow-x-hidden">
+      <div
+        className="
+          mx-auto
+          w-full
+          max-w-[1600px]
+          min-w-0
+          space-y-5
+          px-3
+          py-4
 
-      <DashboardFilters
-        onChange={({ year, month }) => {
-          setYear(year);
-          setMonth(month);
-        }}
-        onApply={fetchDashboardData}
-      />
+          min-[390px]:px-4
+          sm:space-y-6
+          sm:px-5
+          sm:py-5
+          md:space-y-8
+          md:px-6
+          md:py-6
 
-      <DashboardStats
-        totalStudents={data.totalStudents}
-        totalCourses={data.totalCourses}
-        totalRevenue={data.totalRevenue}
-        totalClasses={data.totalClasses}
-        totalTrainers={data.totalTrainers}
-        totalAdmins={data.totalAdmins}
-      />
+          animate-in
+          fade-in
+          duration-500
+        "
+      >
+        <div className="w-full min-w-0">
+          <DashboardHeader />
+        </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RevenueChart data={data.revenueData} />
-        <StudentGrowthChart data={data.studentGrowthData} />
+        <div className="w-full min-w-0">
+          <DashboardFilters
+            onChange={({ year, month }) => {
+              setYear(year);
+              setMonth(month);
+            }}
+            onApply={fetchDashboardData}
+          />
+        </div>
+
+        <div className="w-full min-w-0">
+          <DashboardStats
+            totalStudents={data.totalStudents}
+            totalCourses={data.totalCourses}
+            totalRevenue={data.totalRevenue}
+            totalClasses={data.totalClasses}
+            totalTrainers={data.totalTrainers}
+            totalAdmins={data.totalAdmins}
+          />
+        </div>
+
+        <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2 lg:gap-6">
+          <div className="min-w-0">
+            <RevenueChart data={data.revenueData} />
+          </div>
+
+          <div className="min-w-0">
+            <StudentGrowthChart data={data.studentGrowthData} />
+          </div>
+        </div>
+
+        <div className="grid w-full min-w-0 grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-2 lg:gap-6">
+          <div className="min-w-0">
+            <RecentPayments payments={data.recentPayments} />
+          </div>
+
+          <div className="min-w-0">
+            <RecentUsers users={data.recentUsers} />
+          </div>
+        </div>
       </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <RecentPayments payments={data.recentPayments} />
-        <RecentUsers users={data.recentUsers} />
-      </div>
-    </div>
+    </main>
   );
 }
