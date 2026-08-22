@@ -19,6 +19,7 @@ export default function SignupPage() {
           loading={signup.loading}
           onChange={signup.handleChange}
           onSubmit={signup.handleSubmit}
+          onGoogleSignup={signup.handleGoogleSignup}
         />
       </div>
     </AuthBackground>

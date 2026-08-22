@@ -21,6 +21,7 @@ interface LoginCardProps {
   loading: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+  onGoogleLogin: (credential: string) => void;
 }
 
 export default function LoginCard({
@@ -28,6 +29,7 @@ export default function LoginCard({
   loading,
   onChange,
   onSubmit,
+  onGoogleLogin,
 }: LoginCardProps) {
   return (
     <Card className="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 shadow-2xl backdrop-blur-2xl">
@@ -127,12 +129,7 @@ export default function LoginCard({
             </span>
           </div>
 
-          <GoogleLoginButton
-            loading={loading}
-            onClick={() => {
-              // Google OAuth integration
-            }}
-          />
+          <GoogleLoginButton loading={loading} onSuccess={onGoogleLogin} />
 
           <p className="text-center text-sm text-slate-300">
             Don not have an account?{" "}

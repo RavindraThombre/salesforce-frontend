@@ -17,6 +17,7 @@ interface SignupCardProps {
   loading: boolean;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onGoogleSignup: (credential: string) => void;
 }
 
 export default function SignupCard({
@@ -24,6 +25,7 @@ export default function SignupCard({
   loading,
   onChange,
   onSubmit,
+  onGoogleSignup,
 }: SignupCardProps) {
   return (
     <Card className="w-full max-w-md rounded-3xl border border-white/15 bg-white/10 shadow-2xl backdrop-blur-2xl">
@@ -129,7 +131,7 @@ export default function SignupCard({
           </div>
 
           {/* Google Signup */}
-          <GoogleLoginButton />
+          <GoogleLoginButton loading={loading} onSuccess={onGoogleSignup} />
 
           {/* Login Link */}
           <p className="text-center text-sm text-slate-300">

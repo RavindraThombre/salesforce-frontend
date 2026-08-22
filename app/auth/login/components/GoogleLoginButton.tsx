@@ -1,42 +1,38 @@
 "use client";
 
-import Image from "next/image";
-
-import { Button } from "@/components/ui/button";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface GoogleLoginButtonProps {
   loading?: boolean;
-  onClick?: () => void;
+  onSuccess: (credential: string) => void;
 }
 
 export default function GoogleLoginButton({
   loading = false,
-  onClick,
+  onSuccess,
 }: GoogleLoginButtonProps) {
   return (
-    <Button
-      type="button"
-      variant="outline"
-      className="
-        w-full
-        h-11
-        border-white/20
-        bg-white/5
-        text-white
-        hover:bg-white/10
-        hover:text-white
-      "
-      disabled={loading}
-      onClick={onClick}
+    <div
+      className={`flex w-full justify-center ${
+        loading ? "pointer-events-none opacity-50" : ""
+      }`}
     >
-      <Image
-        src="/salesforce-academy/google.svg"
-        alt="Google"
-        width={18}
-        height={18}
-      />
+      <GoogleLogin
+        onSuccess={(credentialResponse) => {
+          if (!credentialResponse.credential) {
+            return;
+          }
 
-      <span className="ml-2">Continue with Google</span>
-    </Button>
+          onSuccess(credentialResponse.credential);
+        }}
+        onError={() => {
+          console.error("Google authentication failed");
+        }}
+        theme="filled_black"
+        size="large"
+        width="384"
+        text="continue_with"
+      />
+    </div>
   );
 }

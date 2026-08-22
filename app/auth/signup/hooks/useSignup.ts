@@ -1,12 +1,18 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useState } from "react";
+
 import { useRouter } from "next/navigation";
+
 import axios from "axios";
+
 import { toast } from "sonner";
 
 import { SignupForm } from "../lib/signup.type";
 import { signupUser } from "../lib/signupService";
+
+import { useUser } from "@/app/context/UserContext";
+import { apiClient } from "@/app/lib/axiosConfig";
 
 const initialForm: SignupForm = {
   name: "",
@@ -18,9 +24,26 @@ const initialForm: SignupForm = {
 export default function useSignup() {
   const router = useRouter();
 
+  const { login } = useUser();
+
   const [form, setForm] = useState<SignupForm>(initialForm);
 
   const [loading, setLoading] = useState(false);
+
+  const redirectUser = (user: { role: "admin" | "student" | "trainer" }) => {
+    switch (user.role) {
+      case "admin":
+        router.push("/admin");
+        break;
+
+      case "trainer":
+        router.push("/trainer");
+        break;
+
+      default:
+        router.push("/student");
+    }
+  };
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { id, value } = event.target;
@@ -30,6 +53,8 @@ export default function useSignup() {
       [id]: value,
     }));
   };
+
+  /* ================= NORMAL SIGNUP ================= */
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -84,11 +109,43 @@ export default function useSignup() {
     }
   };
 
+  /* ================= GOOGLE SIGNUP / LOGIN ================= */
+
+  const handleGoogleSignup = async (credential: string) => {
+    try {
+      setLoading(true);
+
+      const response = await apiClient.post("/auth/google", {
+        credential,
+      });
+
+      const data = response.data;
+
+      login(data.user, data.token);
+
+      toast.success("Google authentication successful");
+
+      redirectUser(data.user);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ??
+            "Google signup failed. Please try again.",
+        );
+      } else {
+        toast.error("Google signup failed. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     form,
     loading,
 
     handleChange,
     handleSubmit,
+    handleGoogleSignup,
   };
 }

@@ -19,6 +19,7 @@ export default function LoginPage() {
           loading={login.loading}
           onChange={login.handleChange}
           onSubmit={login.handleSubmit}
+          onGoogleLogin={login.handleGoogleLogin}
         />
       </div>
     </AuthBackground>

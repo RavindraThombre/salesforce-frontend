@@ -6,6 +6,7 @@ import MuiProvider from "./theme/MuiThemeProvider";
 import { UserProvider } from "./context/UserContext";
 import Script from "next/script";
 import ClientProviders from "./components/common/ClientProviders";
+import GoogleAuthProvider from "./components/common/GoogleAuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,15 +91,16 @@ export default function RootLayout({
           src="https://checkout.razorpay.com/v1/checkout.js"
           strategy="afterInteractive"
         />
-
-        <UserProvider>
-          <ThemeProvider>
-            <MuiProvider>
-              <ClientProviders />
-              {children}
-            </MuiProvider>
-          </ThemeProvider>
-        </UserProvider>
+        <GoogleAuthProvider>
+          <UserProvider>
+            <ThemeProvider>
+              <MuiProvider>
+                <ClientProviders />
+                {children}
+              </MuiProvider>
+            </ThemeProvider>
+          </UserProvider>
+        </GoogleAuthProvider>
       </body>
     </html>
   );
