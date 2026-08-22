@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -21,7 +21,12 @@ import {
 
 import { useRouter } from "next/navigation";
 import { LogOut, User } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import ThemeToggle from "../ThemeToggle";
 import { useUser } from "@/app/context/UserContext";
 import { motion } from "framer-motion";
@@ -240,33 +245,177 @@ export default function Navbar() {
         </div>
 
         {/* MOBILE MENU */}
+        {/* MOBILE MENU */}
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu />
+            <Button variant="ghost" size="icon" className="md:hidden shrink-0">
+              <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
 
-          <SheetContent side="right" className="w-64">
-            <nav className="flex flex-col gap-4 mt-6">
-              <Link href="/">Home</Link>
-              <Link href="/courses">Courses</Link>
-              <Link href="/blog">Blog</Link>
-              <Link href="/about">About</Link>
-              <Link href="/contact">Contact</Link>
-              <Link href="/faq">FAQ</Link>
-              <Link href="/careers">Careers</Link>
+          <SheetContent
+            side="right"
+            className="
+      flex
+      h-[calc(100vh-2rem)]
+      w-[calc(100vw-2rem)]
+      max-w-sm
+      flex-col
+      rounded-l-2xl
+      p-0
+      sm:hidden
+    "
+          >
+            {/* HEADER */}
+            <div className="flex shrink-0 items-center justify-between border-b px-5 py-4">
+              <div>
+                <h2 className="text-base font-semibold">Menu</h2>
 
-              <div className="border-t pt-4 flex flex-col gap-3">
-                <ThemeToggle />
-                <Button variant="outline" asChild>
-                  <Link href="/auth/login">Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/auth/signup">Sign Up</Link>
-                </Button>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Explore BlueCloudMentor
+                </p>
+              </div>
+            </div>
+
+            {/* SCROLLABLE MENU */}
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-4">
+              <div className="flex flex-col gap-1">
+                <SheetClose asChild>
+                  <Link
+                    href="/"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Home
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/courses"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Courses
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/blog"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Blog
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/about"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    About
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/contact"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Contact
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/live-classes"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Live Classes
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/testimonials"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Testimonials
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/faq"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    FAQ
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/careers"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Careers
+                  </Link>
+                </SheetClose>
+
+                <SheetClose asChild>
+                  <Link
+                    href="/pricing"
+                    className="rounded-lg px-4 py-3 text-sm font-medium transition-colors hover:bg-muted"
+                  >
+                    Pricing
+                  </Link>
+                </SheetClose>
               </div>
             </nav>
+
+            {/* FIXED FOOTER */}
+            <div className="shrink-0 border-t bg-background p-4">
+              <div className="mb-4 flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Appearance
+                </span>
+
+                <ThemeToggle />
+              </div>
+
+              {!user ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <SheetClose asChild>
+                    <Button variant="outline" asChild className="h-10">
+                      <Link href="/auth/login">Login</Link>
+                    </Button>
+                  </SheetClose>
+
+                  <SheetClose asChild>
+                    <Button asChild className="h-10">
+                      <Link href="/auth/signup">Sign Up</Link>
+                    </Button>
+                  </SheetClose>
+                </div>
+              ) : (
+                <SheetClose asChild>
+                  <Button
+                    className="w-full"
+                    onClick={() => {
+                      router.push(
+                        user.role === "admin"
+                          ? "/admin"
+                          : user.role === "trainer"
+                            ? "/trainer"
+                            : "/student",
+                      );
+                    }}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </SheetClose>
+              )}
+            </div>
           </SheetContent>
         </Sheet>
       </div>
