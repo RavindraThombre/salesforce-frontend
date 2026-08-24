@@ -9,7 +9,6 @@ export const getTimeParts = (time: string) => {
 
   const [hourString, minute] = time.split(":");
   const hour24 = Number(hourString);
-
   const period = hour24 >= 12 ? "PM" : "AM";
   const hour12 = hour24 % 12 || 12;
 
@@ -49,9 +48,7 @@ export const formatTime = (time?: string | null) => {
 };
 
 export const formatDateTimeIST = (dateTime?: string | null) => {
-  if (!dateTime) {
-    return "-";
-  }
+  if (!dateTime) return "-";
 
   const date = new Date(dateTime);
 

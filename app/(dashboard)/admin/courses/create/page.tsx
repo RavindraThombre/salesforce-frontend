@@ -10,6 +10,7 @@ import {
   ImageIcon,
   IndianRupee,
   UploadCloud,
+  Video,
   X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +18,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/app/lib/axiosConfig";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 export default function CreateCoursePage() {
   const router = useRouter();
@@ -25,7 +34,21 @@ export default function CreateCoursePage() {
 
   const validationSchema = Yup.object({
     title: Yup.string().trim().required("Course title is required"),
+
     description: Yup.string().trim().required("Course description is required"),
+
+    level: Yup.string()
+      .oneOf(
+        ["Beginner", "Intermediate", "Advanced"],
+        "Please select a valid level",
+      )
+      .required("Course level is required"),
+
+    totalLiveSessions: Yup.number()
+      .typeError("Total live sessions must be a number")
+      .integer("Total live sessions must be a whole number")
+      .min(1, "At least 1 live session is required")
+      .required("Total live sessions is required"),
 
     price: Yup.number().when("isFree", {
       is: false,
@@ -50,6 +73,7 @@ export default function CreateCoursePage() {
               if (value === undefined || value === null) return true;
 
               const price = Number(this.parent.price);
+
               return Number(value) <= price;
             },
           ),
@@ -63,6 +87,8 @@ export default function CreateCoursePage() {
     initialValues: {
       title: "",
       description: "",
+      level: "",
+      totalLiveSessions: 0,
       price: 0,
       discountPrice: 0,
       isFree: false,
@@ -86,6 +112,8 @@ export default function CreateCoursePage() {
 
         formData.append("title", values.title);
         formData.append("description", values.description);
+        formData.append("level", values.level);
+        formData.append("totalLiveSessions", String(values.totalLiveSessions));
         formData.append("isFree", String(values.isFree));
 
         if (!values.isFree) {
@@ -280,6 +308,116 @@ export default function CreateCoursePage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* COURSE LEVEL */}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="level">
+                        Course Level
+                        <span className="ml-1 text-destructive">*</span>
+                      </Label>
+
+                      <Select
+                        value={formik.values.level}
+                        onValueChange={(value) =>
+                          formik.setFieldValue("level", value)
+                        }
+                      >
+                        <SelectTrigger
+                          className={
+                            formik.touched.level && formik.errors.level
+                              ? "border-destructive"
+                              : ""
+                          }
+                        >
+                          <SelectValue placeholder="Select course level" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          <SelectItem value="Beginner">Beginner</SelectItem>
+
+                          <SelectItem value="Intermediate">
+                            Intermediate
+                          </SelectItem>
+
+                          <SelectItem value="Advanced">Advanced</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      {formik.touched.level && formik.errors.level && (
+                        <p className="text-sm text-destructive">
+                          {formik.errors.level}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* LIVE SESSIONS */}
+              <Card>
+                <CardContent className="p-6">
+                  <div className="mb-6 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <Video className="h-5 w-5 text-primary" />
+                    </div>
+
+                    <div>
+                      <h2 className="font-semibold">Live Sessions</h2>
+
+                      <p className="text-sm text-muted-foreground">
+                        Set the maximum number of live sessions for this course.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="max-w-md space-y-2">
+                    <label
+                      htmlFor="totalLiveSessions"
+                      className="text-sm font-medium"
+                    >
+                      Total Live Sessions
+                      <span className="ml-1 text-destructive">*</span>
+                    </label>
+
+                    <Input
+                      id="totalLiveSessions"
+                      name="totalLiveSessions"
+                      type="number"
+                      min={1}
+                      step={1}
+                      placeholder="e.g. 30"
+                      value={
+                        formik.values.totalLiveSessions === 0
+                          ? ""
+                          : formik.values.totalLiveSessions
+                      }
+                      onChange={(e) =>
+                        formik.setFieldValue(
+                          "totalLiveSessions",
+                          Number(e.target.value),
+                        )
+                      }
+                      onBlur={formik.handleBlur}
+                      className={
+                        formik.touched.totalLiveSessions &&
+                        formik.errors.totalLiveSessions
+                          ? "border-destructive"
+                          : ""
+                      }
+                    />
+
+                    {formik.touched.totalLiveSessions &&
+                      formik.errors.totalLiveSessions && (
+                        <p className="text-sm text-destructive">
+                          {formik.errors.totalLiveSessions}
+                        </p>
+                      )}
+
+                    <p className="text-xs text-muted-foreground">
+                      This is the maximum number of live sessions that can be
+                      scheduled for this course.
+                    </p>
                   </div>
                 </CardContent>
               </Card>

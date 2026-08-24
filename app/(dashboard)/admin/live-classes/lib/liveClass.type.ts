@@ -24,6 +24,8 @@ export type LiveClass = {
 export type Course = {
   _id: string;
   title: string;
+  totalLiveSessions?: number;
+  liveClasses?: unknown[];
 };
 
 export type Trainer = {
@@ -31,7 +33,18 @@ export type Trainer = {
   name: string;
 };
 
-export const initialForm = {
+export type LiveClassForm = {
+  courseId: string;
+  trainerId: string;
+  topic: string;
+  date: string;
+  time: string;
+  durationMinutes: string;
+  zoomLink: string;
+  isFree: boolean;
+};
+
+export const initialForm: LiveClassForm = {
   courseId: "",
   trainerId: "",
   topic: "",
@@ -39,4 +52,5 @@ export const initialForm = {
   time: "",
   durationMinutes: "",
   zoomLink: "",
+  isFree: false,
 };

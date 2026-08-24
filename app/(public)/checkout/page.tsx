@@ -14,14 +14,26 @@ type RazorpayResponse = {
   razorpay_payment_id: string;
   razorpay_signature: string;
 };
+
 type Course = {
   _id: string;
   title: string;
   description: string;
   price: number;
+  discountPrice?: number;
   level: string;
   duration?: string;
   syllabus?: string[];
+};
+
+const getCourseAmount = (course: Course) => {
+  const price = Number(course.price) || 0;
+  const discountPrice = Number(course.discountPrice) || 0;
+  if (discountPrice > 0 && discountPrice < price) {
+    return discountPrice;
+  }
+
+  return price;
 };
 
 export default function CheckoutPage() {
@@ -50,59 +62,91 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
 
-      if (course.price === 0) {
-        await verifyPayment({
+      // Final amount based on price / discountPrice
+      const courseAmount = getCourseAmount(course);
+
+      // ==========================================
+      // FREE COURSE
+      // ==========================================
+
+      if (courseAmount <= 0) {
+        const result = await verifyPayment({
           courseId: course._id,
           isFree: true,
         });
-        toast.success("Course enrolled successfully 🎉");
+
+        if (!result.success) {
+          throw new Error(result.message || "Free course enrollment failed");
+        }
+
+        toast.success(result.message || "Course enrolled successfully 🎉");
 
         setTimeout(() => {
           router.push("/student");
         }, 1000);
+
         return;
       }
 
-      const order = await createOrder(course._id, course.price);
+      // ==========================================
+      // PAID COURSE - CREATE ORDER
+      // ==========================================
+
+      const order = await createOrder(course._id, courseAmount);
+
       const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY;
 
       if (!razorpayKey) {
         toast.error("Razorpay key is missing");
         return;
       }
+
       const options = {
         key: razorpayKey,
+
         order_id: order.orderId,
 
+        amount: Math.round(order.amount * 100),
+
+        currency: "INR",
+
         name: "BlueCloudMentor",
+
         description: course.title,
 
-        // config: {
-        //   display: {
-        //     blocks: {
-        //       upi: {
-        //         name: "UPI",
-        //         instruments: [
-        //           {
-        //             method: "upi",
-        //           },
-        //         ],
-        //       },
-        //     },
-        //     sequence: ["block.upi"],
-        //     preferences: {
-        //       show_default_blocks: true,
-        //     },
-        //   },
-        // },
-
         handler: async (response: RazorpayResponse) => {
-          await verifyPayment({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            courseId: course._id,
-          });
+          try {
+            const result = await verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+
+              razorpay_payment_id: response.razorpay_payment_id,
+
+              razorpay_signature: response.razorpay_signature,
+
+              courseId: course._id,
+
+              // Backend validated amount
+              amount: order.amount,
+            });
+
+            if (!result.success) {
+              throw new Error(result.message || "Payment verification failed");
+            }
+
+            toast.success(
+              result.message || "Payment successful and course enrolled 🎉",
+            );
+
+            router.push("/student");
+          } catch (error) {
+            console.error("Payment verification error:", error);
+
+            toast.error(
+              error instanceof Error
+                ? error.message
+                : "Payment verification failed",
+            );
+          }
         },
 
         theme: {
@@ -111,18 +155,22 @@ export default function CheckoutPage() {
       };
 
       const rzp = new window.Razorpay(options);
+
       rzp.on("payment.failed", function (response: unknown) {
         console.log("Payment Failed:", response);
+
+        toast.error("Payment failed");
       });
 
       rzp.on("modal.closed", function () {
-        console.log("Modal closed");
+        console.log("Payment modal closed");
       });
 
       rzp.open();
     } catch (err) {
-      console.error(err);
-      toast.error("Payment failed");
+      console.error("Payment error:", err);
+
+      toast.error(err instanceof Error ? err.message : "Payment failed");
     } finally {
       setLoading(false);
     }

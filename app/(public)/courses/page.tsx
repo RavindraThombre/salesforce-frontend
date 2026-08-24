@@ -8,26 +8,25 @@ import { Button } from "@/components/ui/button";
 import { getCourses } from "./lib/publicCourses";
 import SalesforceLoader from "@/app/components/common/SalesforceLoader";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, CalendarDays, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
-import CourseRating from "./components/CourseRating";
 
 type Course = {
   _id: string;
   title: string;
   description: string;
-  level: string;
+  level?: string;
   price: number;
-  originalPrice?: number;
+  originalPrice?: number | null;
   image?: string;
-
+  totalLiveSessions: number;
   averageRating?: number;
   totalReviews?: number;
 };
 
 const formatCurrency = (value: number) => value.toLocaleString("en-IN");
 
-const getDiscountPercent = (price: number, original?: number) => {
+const getDiscountPercent = (price: number, original?: number | null) => {
   if (!original || original <= price) return 0;
   return Math.round(((original - price) / original) * 100);
 };
@@ -187,12 +186,50 @@ export default function CoursesPage() {
                     </span>
 
                     {/* RATING */}
-                    <CourseRating courseId={course._id} />
+                    <div className="mt-2 flex items-center gap-2">
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+
+                      {course.totalReviews && course.totalReviews > 0 ? (
+                        <>
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            {(course.averageRating ?? 0).toFixed(1)}
+                          </span>
+
+                          <span className="text-xs text-muted-foreground">
+                            ({course.totalReviews}{" "}
+                            {course.totalReviews === 1 ? "review" : "reviews"})
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          No reviews yet
+                        </span>
+                      )}
+                    </div>
 
                     {/* DESCRIPTION */}
                     <p className="mt-1 line-clamp-3 text-sm leading-6 text-muted-foreground">
                       {course.description}
                     </p>
+
+                    <div className="mt-3 flex items-center justify-between text-xs">
+                      {course.level && (
+                        <span className="rounded-full bg-primary/10 px-3 py-1 font-medium text-primary">
+                          {course.level}
+                        </span>
+                      )}
+
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <CalendarDays className="h-4 w-4 text-primary" />
+
+                        <span>
+                          {course.totalLiveSessions}{" "}
+                          {course.totalLiveSessions === 1
+                            ? "Live Session"
+                            : "Live Sessions"}
+                        </span>
+                      </div>
+                    </div>
 
                     {/* INSTRUCTOR */}
                     <div className="mt-3 flex items-center justify-between">

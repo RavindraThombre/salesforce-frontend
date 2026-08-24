@@ -6,13 +6,18 @@ import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/app/lib/axiosConfig";
+import { CalendarDays, Star } from "lucide-react";
 
 type Course = {
   _id: string;
   title: string;
   description: string;
+  isFree: boolean;
   price: number;
   discountPrice?: number;
+  totalLiveSessions: number;
+  averageRating: number;
+  totalReviews: number;
   thumbnail?: string;
 };
 
@@ -146,6 +151,31 @@ export default function AdminCoursesPage() {
                         ₹{formatCurrency(course.price)}
                       </span>
                     )}
+                  </div>
+
+                  {/* COURSE DETAILS */}
+
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-1.5">
+                      <CalendarDays className="h-4 w-4" />
+
+                      <span>
+                        {course.totalLiveSessions} Live Session
+                        {course.totalLiveSessions !== 1 ? "s" : ""}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <Star className="h-4 w-4" />
+
+                      <span>
+                        {course.averageRating > 0
+                          ? course.averageRating.toFixed(1)
+                          : "No rating"}
+
+                        {course.totalReviews > 0 && ` (${course.totalReviews})`}
+                      </span>
+                    </div>
                   </div>
 
                   {/* ACTIONS */}
